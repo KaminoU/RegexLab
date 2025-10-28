@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create ZIP for Package Control
+        run: |
+          # Create a clean directory with only what's needed for ST
+          mkdir -p release
+
+          # Copy plugin files
+          cp -r src release/
+          find release/src -type d -name '__pycache__' -prune -exec rm -rf {} +
+          rm -rf release/src/RegexLab.egg-info
+
+          [ -d data ] && cp -r data release/
+          [ -d messages ] && cp -r messages release/
+          [ -f messages.json ] && cp messages.json release/
+
+          cp *.sublime-* release/ 2>/dev/null || true
+          cp RegexLab.py release/
+          cp .python-version release/
+          cp README.md release/
+          cp LICENSE.md release/
+          cp CHANGELOG.md release/
+
+          # Create zip
+          cd release
+          zip -r ../RegexLab-${{ steps.version.outputs.VERSION }}.zip .
+          cd ..
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Extract changelog for this version
+          awk '/^## \[${{ steps.version.outputs.VERSION }}\]/,/^## \[/' CHANGELOG.md | head -n -1 > release_notes.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: RegexLab-${{ steps.version.outputs.VERSION }}.zip
+          body_path: release_notes.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notification
+        run: |
+          echo "🎉 Release v${{ steps.version.outputs.VERSION }} created!"
+          echo "📦 Package: RegexLab-${{ steps.version.outputs.VERSION }}.zip"

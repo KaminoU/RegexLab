@@ -1,0 +1,47 @@
+[
+    // ============================================================================
+    // RegexLab - Default Key Bindings
+    // ============================================================================
+    //
+    // To customize these key bindings, don't edit this file directly!
+    // Instead, copy the binding you want to change to your User key bindings:
+    //
+    //   1. Open: Preferences → Key Bindings
+    //   2. Copy the binding from this file to the RIGHT panel (User bindings)
+    //   3. Change the "keys" value to your preferred shortcut
+    //
+    // Example - Change Ctrl+Shift+R to Ctrl+Alt+P:
+    //
+    //   {
+    //       "keys": ["ctrl+alt+p"],
+    //       "command": "regex_lab_load_pattern"
+    //   }
+    //
+    // User bindings always override plugin bindings, so your custom shortcuts
+    // will take priority.
+    // ============================================================================
+
+    // === Load Pattern (Quick Panel) ===
+    // Opens Quick Panel to select and load a regex pattern from portfolios
+    {
+        "keys": ["ctrl+shift+r"],
+        "command": "regex_lab_load_pattern"
+    },
+
+    // === Portfolio Manager (Central Hub) ===
+    // Opens Portfolio Manager hub for all portfolio operations
+    {
+        "keys": ["ctrl+alt+p"],
+        "command": "regex_lab_portfolio_manager"
+    },
+
+    // === Use Selection (Context-aware) ===
+    // Create pattern from selected text (only available when text is selected)
+    {
+        "keys": ["ctrl+shift+alt+r"],
+        "command": "regex_lab_use_selection",
+        "context": [
+            { "key": "selection_empty", "operator": "equal", "operand": false }
+        ]
+    }
+]

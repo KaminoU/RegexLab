@@ -1,0 +1,157 @@
+{
+    // === Portfolios Configuration ===
+    // RegexLab now automatically loads portfolios from these folders:
+    // 1. RegexLab/data/portfolios/*.json (Built-in, always loaded)
+    // 2. User/RegexLab/portfolios/*.json (Your custom portfolios, auto-loaded)
+    // 3. User/RegexLab/disabled_portfolios/*.json (Disabled, NOT loaded)
+    //
+    // To enable/disable portfolios:
+    // - Enable: Move .json from disabled_portfolios/ to portfolios/
+    // - Disable: Move .json from portfolios/ to disabled_portfolios/
+    // - Or use: Ctrl+Alt+P (Portfolio Manager)
+
+    // === Variables Configuration ===
+    "variables": {
+        // Default values used in wizards and format settings for NOW keyword
+        "username": "",  // New Portfolio Wizard default author (leave empty for system username)
+        "date_format": "%Y-%m-%d",       // Format for NOW keyword with {{DATE}} variable
+        "time_format": "%H:%M:%S",       // Format for NOW keyword with {{TIME}} variable
+        "datetime_format": "%Y-%m-%d %H:%M:%S"  // Format for NOW keyword with {{DATETIME}} variable
+    },
+
+    // === Variable Assertions (Input Validation) ===
+    // Define validation rules for dynamic variables in patterns
+    //
+    // NEW FORMAT (Flexible & User-Friendly):
+    // "VARIABLE_NAME": {
+    //     "regex": "validation-pattern",  // Regex pattern for validation (required)
+    //     "default": "default-value",     // Pre-filled value (optional, use "NOW" for auto date/time)
+    //     "hint": "user-friendly-hint",   // Short description (optional, shown in prompt/popup)
+    //     "example": "example-value"      // Example value (optional, shown in prompt/popup)
+    // }
+    //
+    // OLD FORMAT (Still Supported - Backward Compatible):
+    // "VARIABLE_NAME": "validation-pattern"  // Simple regex string
+    //
+    // SPECIAL VALUE: "NOW"
+    // For DATE/TIME/DATETIME variables, use "NOW" in 'default' to auto-fill with current date/time
+    // Format is taken from 'date_format', 'time_format', or 'datetime_format' in 'variables' section
+    //
+    // PROMPT EXAMPLES:
+    // - hint + example: "Enter value for {{VAR}} (hint: YYYY-MM-DD format, e.g. 2025-10-23):"
+    // - hint only:      "Enter value for {{VAR}} (hint: YYYY-MM-DD format):"
+    // - example only:   "Enter value for {{VAR}} (e.g. 2025-10-23):"
+    // - neither:        "Enter value for {{VAR}} (free input):"
+    "variables_assertion": {
+        // Date/Time formats (NEW FORMAT with hints)
+        "DATE": {
+            "regex": "[0-9]{4}-[0-9]{2}-[0-9]{2}",
+            "default": "NOW",
+            "hint": "YYYY-MM-DD format",
+            "example": "2025-10-23"
+        },
+        "DATETIME": {
+            "regex": "[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}",
+            "default": "NOW",
+            "hint": "YYYY-MM-DD HH:MM:SS format",
+            "example": "2025-10-23 15:30:45"
+        },
+        "TIME": {
+            "regex": "[0-9]{2}:[0-9]{2}:[0-9]{2}",
+            "default": "NOW",
+            "hint": "HH:MM:SS format",
+            "example": "15:30:45"
+        },
+
+        // Log levels (NEW FORMAT with custom hint)
+        "LEVEL": {
+            "regex": "DEBUG|INFO|WARN(ING)?|ERROR|CRITICAL|FATAL",
+            "default": "INFO",
+            "hint": "Log severity level",
+            "example": "DEBUG, INFO, WARN/WARNING, ERROR, CRITICAL, FATAL"
+        },
+
+        // Common technical patterns (NEW FORMAT)
+        "USERNAME": {
+            "regex": "[a-zA-Z0-9_-]{3,}",
+            "hint": "Alphanumeric username (min 3 chars)",
+            "example": "john_doe, user123"
+        },
+        "EMAIL": {
+            "regex": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+            "hint": "Email address",
+            "example": "user@example.com"
+        },
+        "IP": {
+            "regex": "([0-9]{1,3}\\.){3}[0-9]{1,3}",
+            "hint": "IPv4 address",
+            "example": "192.168.1.1"
+        },
+        "PORT": {
+            "regex": "[0-9]{1,5}",
+            "default": "8080",
+            "hint": "Port number (0-99999)",
+            "example": "80, 443, 8080"
+        },
+        "UUID": {
+            "regex": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}",
+            "hint": "UUID format",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+        }
+
+        // Add your custom assertions here:
+        // "MY_VAR": {
+        //     "regex": "your-pattern",
+        //     "default": "your-default",  // Optional
+        //     "hint": "what user should enter",  // Optional
+        //     "example": "example values"  // Optional
+        // }
+        //
+        // OR use simple format (backward compatible):
+        // "MY_VAR": "your-regex-pattern"
+    },
+
+    // === Variable Assertion Defaults (DEPRECATED - Use 'default' in variables_assertion instead) ===
+    // This setting is kept for backward compatibility only
+    // New configurations should use the 'default' field in 'variables_assertion' instead
+    //
+    // If both are defined, 'variables_assertion.default' takes precedence
+    "variables_assertion_defaults": {
+        // DEPRECATED: Move these to 'default' field in 'variables_assertion' instead
+        // "DATE": "NOW",
+        // "DATETIME": "NOW",
+        // "TIME": "NOW",
+        // "LEVEL": "INFO",
+        // "PORT": "8080"
+    },
+
+    // === UI Configuration ===
+    "preview_on_selection": false,  // Show phantom preview when text is selected
+    "show_pattern_type_icons": true,  // Show icons for static/dynamic patterns
+    "quick_panel_show_descriptions": true,
+    "quick_panel_width": 68,  // Character width for Quick Panel alignment (adjust based on your window size/theme)
+    "status_message_duration": 13000,  // Duration in milliseconds for error/info messages (default: 13s)
+    "show_input_help_popup": false,  // Show helpful popup when entering variable values
+    "popup_display_duration": 20000,  // Duration in milliseconds for input help popup before showing input panel (default: 20s, user can press ESC to close earlier)
+
+    // === Export Configuration ===
+    // Default directory for portfolio exports
+    // Special values:
+    //   "~/" = User home directory (e.g., "~/RegexLab" or "~/Downloads/RegexLab")
+    //   Any absolute or relative path
+    // Default: "~/RegexLab" creates a RegexLab folder in your home directory
+    "export_default_directory": "~/RegexLab",
+
+    // === Search Configuration ===
+    "inject_to_native_find_panel": true,
+    "preserve_case_sensitive": false,
+    "preserve_regex_mode": true,
+
+    // === Debug & Logging ===
+    // Options: "DEBUG", "INFO", "WARNING", "ERROR"
+    // DEBUG: Detailed diagnostic information
+    // INFO: General informational messages (default)
+    // WARNING: Warning messages
+    // ERROR: Error messages only
+    "log_level": "INFO"
+}
