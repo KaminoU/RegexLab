@@ -8,7 +8,7 @@
     // To enable/disable portfolios:
     // - Enable: Move .json from disabled_portfolios/ to portfolios/
     // - Disable: Move .json from portfolios/ to disabled_portfolios/
-    // - Or use: Ctrl+Alt+P (Portfolio Manager)
+    // - Or use: Ctrl+K, Ctrl+P (Portfolio Manager)
 
     // === Variables Configuration ===
     "variables": {

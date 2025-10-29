@@ -43,7 +43,7 @@ Thank you for installing RegexLab! 🚀
 RegexLab transforms how you work with regex patterns in Sublime Text:
 
   • 📚 Portfolio System - Organize patterns by project or domain
-  • 🔍 Quick Pattern Loading - Ctrl+Shift+R to browse and inject
+  • 🔍 Quick Pattern Loading - Ctrl+K, Ctrl+R to browse and inject
   • 🧪 Dynamic Variables - {{DATE}}, {{USERNAME}}, custom placeholders
   • 🛡️ Integrity Protection - Built-in portfolios auto-restore if corrupted
   • 🎯 Smart Panel Targeting - Patterns open in the right panel automatically
@@ -52,16 +52,16 @@ RegexLab transforms how you work with regex patterns in Sublime Text:
 
 📖 QUICK START:
 
-1. Press Ctrl+Shift+R (Cmd+Shift+R on macOS) to load a pattern
+1. Press Ctrl+K, Ctrl+R (Cmd+K, Cmd+R on macOS) to load a pattern
    → Browse built-in patterns (data validation, network, dates, cleanup)
    → Select a pattern → It's injected into Find panel with regex ON
 
-2. Press Ctrl+Alt+P (Cmd+Alt+P on macOS) for Portfolio Manager
+2. Press Ctrl+K, Ctrl+P (Cmd+K, Cmd+P on macOS) for Portfolio Manager
    → View/manage all portfolios
    → Create new portfolios with the wizard
    → Enable/disable portfolios on the fly
 
-3. Select text → Press Ctrl+Shift+Alt+R (Cmd+Shift+Alt+R on macOS)
+3. Select text → Press Ctrl+K, Ctrl+U (Cmd+K, Cmd+U on macOS)
    → Quick actions: Save as pattern or inject into panels
 
 ═══════════════════════════════════════════════════════════════════════════════
@@ -93,13 +93,13 @@ More portfolios coming soon (RXL - Dev, RXL - Config, RXL - Log)!
 
   • Documentation: https://github.com/KaminoU/RegexLab/blob/main/README.md
   • Issues/Bugs: https://github.com/KaminoU/RegexLab/issues
-  • Command Palette: "Regex Lab: About" to see this guide again
+  • Command Palette: "RegexLab: About" to see this guide again
 
 ═══════════════════════════════════════════════════════════════════════════════
 
 💡 PRO TIPS:
 
-  1. Use the Portfolio Wizard (Ctrl+Alt+P → "New Portfolio") instead of
+  1. Use the Portfolio Wizard (Ctrl+K, Ctrl+P → "New Portfolio") instead of
      manually editing JSON files
 
   2. Enable DEBUG logging to see detailed loading steps:

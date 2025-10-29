@@ -78,9 +78,9 @@ RegexLab transforms how you work with regex patterns in Sublime Text.
 
 🔧 QUICK START:
 
-  1. Ctrl+Shift+R → Load Pattern
-  2. Ctrl+Alt+P → Portfolio Manager
-  3. Ctrl+Shift+Alt+R → Use Selection
+  1. Ctrl+K, Ctrl+R → Load Pattern
+  2. Ctrl+K, Ctrl+P → Portfolio Manager
+  3. Ctrl+K, Ctrl+U → Use Selection
 
 ═══════════════════════════════════════════════════════════════════════════════
 

@@ -162,7 +162,7 @@ Create a new file in `User/RegexLab/portfolios/` (e.g., `my-portfolio.json`):
 }
 ```
 
-**Done!** Restart Sublime Text or use **Portfolio Manager** (`Ctrl+Alt+P` → "Reload Portfolios") and your portfolio will be auto-loaded.
+**Done!** Restart Sublime Text or use **Portfolio Manager** (`Ctrl+K, Ctrl+P` → "Reload Portfolios") and your portfolio will be auto-loaded.
 
 ### Disabling a portfolio temporarily
 
@@ -178,7 +178,7 @@ User/RegexLab/disabled_portfolios/my-portfolio.json
     → User/RegexLab/portfolios/my-portfolio.json
 ```
 
-Or use **Portfolio Manager** (`Ctrl+Alt+P`) and select "Disable Portfolio".
+Or use **Portfolio Manager** (`Ctrl+K, Ctrl+P`) and select "Disable Portfolio".
 
 ## 🎯 Common use cases
 
@@ -219,7 +219,7 @@ mv User/RegexLab/portfolios/python-patterns.json User/RegexLab/disabled_portfoli
 mv User/RegexLab/disabled_portfolios/web-patterns.json User/RegexLab/portfolios/
 ```
 
-Or use **Portfolio Manager** (`Ctrl+Alt+P`) for visual enable/disable!
+Or use **Portfolio Manager** (`Ctrl+K, Ctrl+P`) for visual enable/disable!
 
 ### Organizing portfolios by domain
 
@@ -398,7 +398,7 @@ Patterns can automatically open in the most appropriate Sublime Text panel using
 - Multi-purpose patterns (user decides find vs replace)
 - Patterns where intent is ambiguous
 
-⚠️ **Tip:** Use the **Portfolio Wizard** (`Regex Lab: New Portfolio`) or **Portfolio Manager** (`Ctrl+Alt+P`) to create/edit patterns ; they help you choose the right `default_panel` automatically! Manual JSON editing is error-prone and easy to mess up.
+⚠️ **Tip:** Use the **Portfolio Wizard** (`RegexLab: New Portfolio`) or **Portfolio Manager** (`Ctrl+K, Ctrl+P`) to create/edit patterns ; they help you choose the right `default_panel` automatically! Manual JSON editing is error-prone and easy to mess up.
 
 ### Optional fields
 
@@ -504,7 +504,7 @@ When RegexLab loads, it verifies **all builtin portfolios** before loading any p
 
 ### Managing many portfolios
 
-**Use Portfolio Manager** (`Ctrl+Alt+P`):
+**Use Portfolio Manager** (`Ctrl+K, Ctrl+P`):
 - See all loaded portfolios at a glance
 - View disabled portfolios (if any exist)
 - Enable/disable with one click
@@ -526,7 +526,7 @@ This way your team shares active portfolios, but disabled ones stay local.
 ## 🔗 Related documentation
 
 - **Integrity System**: See `data/.regexlab/README.md` for builtin portfolio protection
-- **Portfolio Manager**: Press `Ctrl+Alt+P` to manage portfolios visually
-- **New Portfolio Wizard**: `Ctrl+Shift+P` → "Regex Lab: New Portfolio"
+- **Portfolio Manager**: Press `Ctrl+K, Ctrl+P` to manage portfolios visually
+- **New Portfolio Wizard**: `Ctrl+Shift+P` → "RegexLab: New Portfolio"
 - **Settings**: Full settings documentation in default settings file
 - **Commands**: List available via Command Palette (`Ctrl+Shift+P` → "RegexLab")

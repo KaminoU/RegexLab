@@ -10,6 +10,8 @@ Never dig through old files or re-Google regex patterns again. Save them in port
 
 <img src="https://raw.githubusercontent.com/KaminoU/RegexLab/main/docs/assets/logo/regex.png" alt="RegexLab Demo" width="418"/>
 
+> **📹 Video Note:** If you're watching older demonstration videos, please note that keyboard shortcuts were updated to comply with Package Control guidelines. Videos show previous shortcuts, but functionality remains identical with the new bindings listed below.
+
 </div>
 
 ---
@@ -28,10 +30,10 @@ Never dig through old files or re-Google regex patterns again. Save them in port
 
 | Feature | What it does | Demo |
 |---------|--------------|------|
-| **🎯 Load Pattern** (`Ctrl+Shift+R`) | Browse and inject patterns into Find or configured panel (Portfolio Manager for override) | [<img src="https://raw.githubusercontent.com/KaminoU/RegexLab/main/docs/assets/demos/load_pattern.thumb.gif" alt="Load Pattern demo (thumb)" width="180">](https://raw.githubusercontent.com/KaminoU/RegexLab/main/docs/assets/demos/load_pattern.gif) |
-| **📦 Portfolio Manager** (`Ctrl+Alt+P`) | Manage multiple pattern collections with one click | [<img src="https://raw.githubusercontent.com/KaminoU/RegexLab/main/docs/assets/demos/portfolio_manager.thumb.gif" alt="Portfolio Manager demo (thumb)" width="180">](https://raw.githubusercontent.com/KaminoU/RegexLab/main/docs/assets/demos/portfolio_manager.gif) |
+| **🎯 Load Pattern** (`Ctrl+K, Ctrl+R`) | Browse and inject patterns into Find or configured panel (Portfolio Manager for override) | [<img src="https://raw.githubusercontent.com/KaminoU/RegexLab/main/docs/assets/demos/load_pattern.thumb.gif" alt="Load Pattern demo (thumb)" width="180">](https://raw.githubusercontent.com/KaminoU/RegexLab/main/docs/assets/demos/load_pattern.gif) |
+| **📦 Portfolio Manager** (`Ctrl+K, Ctrl+P`) | Manage multiple pattern collections with one click | [<img src="https://raw.githubusercontent.com/KaminoU/RegexLab/main/docs/assets/demos/portfolio_manager.thumb.gif" alt="Portfolio Manager demo (thumb)" width="180">](https://raw.githubusercontent.com/KaminoU/RegexLab/main/docs/assets/demos/portfolio_manager.gif) |
 | **🧙 New Portfolio/Pattern Wizard** | Step-by-step guided portfolio/pattern creation | [<img src="https://raw.githubusercontent.com/KaminoU/RegexLab/main/docs/assets/demos/new_portfolio.thumb.gif" alt="Portfolio Wizard demo (thumb)" width="180">](https://raw.githubusercontent.com/KaminoU/RegexLab/main/docs/assets/demos/new_portfolio.gif) |
-| **✏️ Use Selection** (`Ctrl+Shift+Alt+R`) | Quick actions from selected text: save as pattern or inject into panels | [<img src="https://raw.githubusercontent.com/KaminoU/RegexLab/main/docs/assets/demos/selection_pattern.thumb.gif" alt="Use Selection demo (thumb)" width="180">](https://raw.githubusercontent.com/KaminoU/RegexLab/main/docs/assets/demos/selection_pattern.gif) |
+| **✏️ Use Selection** (`Ctrl+K, Ctrl+U`) | Quick actions from selected text: save as pattern or inject into panels | [<img src="https://raw.githubusercontent.com/KaminoU/RegexLab/main/docs/assets/demos/selection_pattern.thumb.gif" alt="Use Selection demo (thumb)" width="180">](https://raw.githubusercontent.com/KaminoU/RegexLab/main/docs/assets/demos/selection_pattern.gif) |
 | **🧪 Dynamic Patterns** | Use custom variables like `{{JUST_A_VAR}}` in patterns | [<img src="https://raw.githubusercontent.com/KaminoU/RegexLab/main/docs/assets/demos/dynamic_pattern.thumb.gif" alt="Dynamic Patterns demo (thumb)" width="180">](https://raw.githubusercontent.com/KaminoU/RegexLab/main/docs/assets/demos/dynamic_pattern.gif) |
 
 ---
@@ -83,28 +85,28 @@ Package Control remembers the custom repository, so future updates come through 
 
 ## 🚀 Quick Start
 
-### 1️⃣ Load a pattern (`Ctrl+Shift+R`)
+### 1️⃣ Load a pattern (`Ctrl+K, Ctrl+R`)
 
-Press `Ctrl+Shift+R` (or `Cmd+Shift+R` on macOS) to open the pattern selector:
+Press `Ctrl+K, Ctrl+R` (or `Cmd+K, Cmd+R` on macOS) to open the pattern selector:
 
 1. Browse patterns from all active portfolios
 2. Select a pattern
 3. The regex is injected into the Find panel
 4. Adjust scope and search!
 
-### 2️⃣ Create a pattern from selection (`Ctrl+Shift+Alt+R`)
+### 2️⃣ Create a pattern from selection (`Ctrl+K, Ctrl+U`)
 
 1. Select text in your file (e.g., `API_KEY`)
-2. Press `Ctrl+Shift+Alt+R` (or `Cmd+Shift+Alt+R` on macOS)
+2. Press `Ctrl+K, Ctrl+U` (or `Cmd+K, Cmd+U` on macOS)
 3. Choose an action:
    - **✨ Create New Pattern** / Save to portfolio with a name
    - **🔍 Use as Find Pattern** / Inject directly into Find panel
    - **🔄 Use as Replace Pattern** / Inject into Replace panel
    - **📁 Use as Find in Files** / Inject into Find in Files panel
 
-### 3️⃣ Manage portfolios (`Ctrl+Alt+P`)
+### 3️⃣ Manage portfolios (`Ctrl+K, Ctrl+P`)
 
-Press `Ctrl+Alt+P` (or `Cmd+Alt+P` on macOS) to open the Portfolio Manager:
+Press `Ctrl+K, Ctrl+P` (or `Cmd+K, Cmd+P` on macOS) to open the Portfolio Manager:
 
 - View all loaded and disabled portfolios
 - Enable/disable portfolios with one click
@@ -119,9 +121,9 @@ RegexLab provides convenient keyboard shortcuts for lightning-fast access:
 
 | Shortcut | Command | What it does |
 |----------|---------|--------------|
-| `Ctrl+Shift+R` (`Cmd+Shift+R`) | **Load Pattern** | Open pattern selector and inject regex into Find panel |
-| `Ctrl+Alt+P` (`Cmd+Alt+P`) | **Portfolio Manager** | Visual hub for managing all portfolios |
-| `Ctrl+Shift+Alt+R` (`Cmd+Shift+Alt+R`) | **Use Selection** | Quick actions on selected text: save as pattern or inject into panels |
+| `Ctrl+K, Ctrl+R` (`Cmd+K, Cmd+R`) | **Load Pattern** | Open pattern selector and inject regex into Find panel |
+| `Ctrl+K, Ctrl+P` (`Cmd+K, Cmd+P`) | **Portfolio Manager** | Visual hub for managing all portfolios |
+| `Ctrl+K, Ctrl+U` (`Cmd+K, Cmd+U`) | **Use Selection** | Quick actions on selected text: save as pattern or inject into panels |
 
 💡 **Tip**: Customize these shortcuts in `Preferences > Package Settings > RegexLab > Key Bindings`
 
@@ -149,7 +151,7 @@ User/RegexLab/disabled_portfolios/*.json
 ```
 
 **Enable/disable portfolios:**
-- Use Portfolio Manager (`Ctrl+Alt+P`) → "Enable/Disable Portfolio"
+- Use Portfolio Manager (`Ctrl+K, Ctrl+P`) → "Enable/Disable Portfolio"
 - Or drag `.json` files between `portfolios/` and `disabled_portfolios/`
 
 **Create new portfolio:**
@@ -291,7 +293,7 @@ Create `User/RegexLab/portfolios/my-portfolio.json`:
 
 ⚠️ **Tip**: Use the **Portfolio Wizard** or **Portfolio Manager** to create/edit patterns ; they handle `default_panel` automatically! Manual JSON editing is error-prone.
 
-Restart Sublime Text or reload portfolios (`Ctrl+Alt+P` → "Reload Portfolios").
+Restart Sublime Text or reload portfolios (`Ctrl+K, Ctrl+P` → "Reload Portfolios").
 
 📖 **Learn more**: [Portfolio Schema Documentation](data/portfolios/README.md#portfolio-schema)
 
@@ -388,7 +390,7 @@ Coming soon! Be the first to share yours! 🚀
 
 1. Download the JSON file from the gist
 2. Save it to `User/RegexLab/portfolios/`
-3. Restart Sublime Text or reload portfolios (`Ctrl+Alt+P` → "Reload Portfolios")
+3. Restart Sublime Text or reload portfolios (`Ctrl+K, Ctrl+P` → "Reload Portfolios")
 
 **Popular ideas for portfolios:**
 - Python/Django patterns (imports, decorators, ORM queries)
