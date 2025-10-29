@@ -1,0 +1,110 @@
+# =============================================================================
+# .gitignore - Regex Lab
+# =============================================================================
+
+# --- Root dotfiles (ignore all except git-related and CI) ---
+/.*
+!/.gitignore
+!/.gitattributes
+!/.github/
+!/.python-version
+!/.editorconfig
+!/.markdownlint-cli2.jsonc
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# --- Virtual environments ---
+venv/
+ENV/
+env/
+.venv
+
+# --- Testing ---
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+*.cover
+.hypothesis/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# --- IDEs ---
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# --- OS specific ---
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# --- Sublime Text specific ---
+# Cache and temp files
+*.cache
+*.last-run
+*.sublime-settings.merged
+*.sublime-project.merged
+
+# --- Project specific ---
+# Temporary files
+/tmp/
+
+# Logs
+*.log
+
+# UnitTesting artifacts
+/panel
+
+# Build artifacts (if any)
+/build/
+/dist/
+
+# Test scripts (not part of plugin, temporary validation only)
+/test_*.py
+
+# =============================================================================
+# What IS tracked:
+# - .github/ folder (CI/CD workflows)
+# - .python-version (Python version specification)
+# - Source code (*.py)
+# - Default settings (.sublime-settings in root, not user-specific)
+# - Menus, commands, keymaps (.sublime-*)
+# - Tests (tests/)
+# - Documentation (README, LICENSE, etc.)
+# =============================================================================

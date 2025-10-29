@@ -1,0 +1,112 @@
+# =============================================================================
+# .gitattributes - Regex Lab
+# =============================================================================
+
+# Auto detect text files and normalize line endings to LF in repository
+* text=auto
+
+# --- Source code ---
+*.py text diff=python
+*.pyi text diff=python
+
+# --- Configuration files ---
+*.json text
+*.sublime-settings text
+*.sublime-commands text
+*.sublime-menu text
+*.sublime-keymap text
+*.sublime-completions text
+*.sublime-syntax text
+*.sublime-color-scheme text
+*.tmPreferences text
+
+# --- Documentation ---
+*.md text diff=markdown
+*.txt text
+LICENSE text
+CHANGELOG text
+
+# --- Scripts ---
+*.sh text eol=lf
+*.bash text eol=lf
+
+# --- Windows specific ---
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# --- Binary files ---
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg binary
+
+# --- Archives ---
+*.zip binary
+*.tar binary
+*.gz binary
+*.tgz binary
+
+# --- Linguist overrides (for GitHub language detection) ---
+*.sublime-syntax linguist-language=YAML
+*.sublime-settings linguist-language=JSON
+*.sublime-menu linguist-language=JSON
+*.sublime-commands linguist-language=JSON
+
+# Mark documentation and test files
+*.md linguist-documentation
+tests/* linguist-documentation
+
+# =============================================================================
+# Git diff settings
+# =============================================================================
+
+# Python functions in diffs
+*.py diff=python
+
+# JSON formatting in diffs
+*.json diff=json
+*.sublime-settings diff=json
+
+# =============================================================================
+# Release archives (exclude from GitHub zip/tar when tagging)
+# =============================================================================
+
+# Don't ship docs, GitHub meta, coverage, long exchanges, or tests in Package Control builds
+/docs export-ignore
+/.github export-ignore
+/tests export-ignore
+/.editorconfig export-ignore
+/.markdownlint-cli2.jsonc export-ignore
+/tox.ini export-ignore
+/pyproject.toml export-ignore
+
+# Coverage outputs and caches
+/htmlcov export-ignore
+/htmlcov-core export-ignore
+/htmlcov-ui export-ignore
+/.coverage export-ignore
+/.coveragerc export-ignore
+/.coveragerc-core export-ignore
+/.coveragerc-ui export-ignore
+/.mypy_cache export-ignore
+/.pytest_cache export-ignore
+/.ruff_cache export-ignore
+/.tox export-ignore
+
+# Local/dev-only files and helpers
+/unittesting.json export-ignore
+
+# VCS meta (harmless but noise in release zips)
+/.gitignore export-ignore
+/.gitattributes export-ignore
+
+# =============================================================================
+# Integrity-protected portfolios (restored from keystore on first run)
+# =============================================================================
+
+# Exclude builtin portfolio JSON files (keystore rxl.kst will restore them)
+# Keep README.md for documentation
+/data/portfolios/*.json export-ignore

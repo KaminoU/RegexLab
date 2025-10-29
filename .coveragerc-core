@@ -1,0 +1,26 @@
+# Coverage configuration for CORE LOGIC ONLY (excludes UI commands)
+
+[run]
+source = src
+omit =
+    */site-packages/*
+    */tests/*
+    */__pycache__/*
+    # Exclude UI commands (Sublime Text API glue code)
+    src/commands/*
+
+[report]
+precision = 2
+show_missing = True
+skip_covered = False
+
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    @abstractmethod
+
+[html]
+directory = htmlcov-core

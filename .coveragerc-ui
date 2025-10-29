@@ -1,0 +1,24 @@
+# Coverage configuration for UI COMMANDS ONLY
+
+[run]
+source = src/commands
+omit =
+    */site-packages/*
+    */tests/*
+    */__pycache__/*
+
+[report]
+precision = 2
+show_missing = True
+skip_covered = False
+
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    @abstractmethod
+
+[html]
+directory = htmlcov-ui

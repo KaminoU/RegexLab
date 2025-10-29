@@ -1,0 +1,55 @@
+[
+    // === Load Pattern Commands ===
+    {
+        "caption": "Regex Lab: Load Pattern",
+        "command": "regex_lab_load_pattern"
+    },
+
+    // === Create from Selection ===
+    {
+        "caption": "Regex Lab: Use Selection",
+        "command": "regex_lab_use_selection"
+    },
+
+    // === Portfolio Management ===
+    {
+        "caption": "Regex Lab: Portfolio Manager",
+        "command": "regex_lab_portfolio_manager"
+    },
+    {
+        "caption": "Regex Lab: Switch Portfolio",
+        "command": "regex_lab_switch_portfolio"
+    },
+    {
+        "caption": "Regex Lab: New Portfolio",
+        "command": "regex_lab_new_portfolio_wizard"
+    },
+    {
+        "caption": "Regex Lab: Import Portfolio",
+        "command": "regex_lab_import_portfolio"
+    },
+    {
+        "caption": "Regex Lab: Export Portfolio",
+        "command": "regex_lab_export_portfolio"
+    },
+    {
+        "caption": "Regex Lab: Reload Portfolios",
+        "command": "regex_lab_reload_portfolios"
+    },
+
+    // === Settings ===
+    {
+        "caption": "Preferences: Regex Lab Settings",
+        "command": "edit_settings",
+        "args": {
+            "base_file": "${packages}/RegexLab/RegexLab.sublime-settings",
+            "default": "// Settings in here override those in \"RegexLab.sublime-settings\"\n{\n\t$0\n}\n"
+        }
+    },
+
+    // === About ===
+    {
+        "caption": "Regex Lab: About",
+        "command": "regexlab_about"
+    }
+]

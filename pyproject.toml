@@ -1,0 +1,137 @@
+# pyproject.toml - Regex Lab
+
+[project]
+name = "RegexLab"
+version = "1.0.0-dev"
+description = "Save and manage your regex patterns in portfolios for Sublime Text 4"
+authors = [{ name = "Michel TRUONG", email = "contact@example.com" }]
+license = { text = "MIT" }
+requires-python = ">=3.8"
+readme = "README.md"
+
+[project.urls]
+Homepage = "https://github.com/KaminoU/RegexLab"
+Repository = "https://github.com/KaminoU/RegexLab.git"
+Issues = "https://github.com/KaminoU/RegexLab/issues"
+Changelog = "https://github.com/KaminoU/RegexLab/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.1.0",
+    "mypy>=1.0.0,<1.19.0", # mypy 1.15+ requires Python 3.9+
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "tox>=4.0.0",
+]
+
+[tool.ruff]
+# Target Python 3.8
+target-version = "py38"
+line-length = 120
+
+# Source directories
+src = ["src"]
+
+# Exclude directories
+exclude = [
+    ".git",
+    ".github",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "tmp",
+]
+
+[tool.ruff.lint]
+# Enable rules
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+    "RUF", # Ruff-specific rules
+]
+
+# Ignore specific rules
+ignore = [
+    "E501",   # Line too long (handled by formatter)
+    "N802",   # Function name should be lowercase (ST API uses CamelCase)
+    "N806",   # Variable in function should be lowercase (ST API)
+    "SIM105", # Use contextlib.suppress (prefer explicit try-except in tests)
+]
+
+[tool.ruff.format]
+# Use double quotes for strings
+quote-style = "double"
+
+# Indent with spaces
+indent-style = "space"
+
+# Use Unix line endings
+line-ending = "lf"
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+strict_optional = true
+
+# Sublime Text API stubs not available
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+# Ignore UI tests (require Sublime Text runtime with UnitTesting framework)
+norecursedirs = ["tests/ui", ".tox", ".git", "__pycache__"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+
+# Markers
+markers = [
+    "unit: Unit tests (fast, no external dependencies)",
+    "integration: Integration tests (require Sublime Text runtime)",
+    "slow: Slow tests",
+]
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["*/tests/*", "*/test_*.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
+
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"

@@ -1,0 +1,43 @@
+[
+    {
+        "id": "preferences",
+        "children": [
+            {
+                "id": "package-settings",
+                "children": [
+                    {
+                        "caption": "Regex Lab",
+                        "children": [
+                            {
+                                "caption": "Settings",
+                                "command": "edit_settings",
+                                "args": {
+                                    "base_file": "${packages}/RegexLab/RegexLab.sublime-settings",
+                                    "default": "// Settings in here override those in \"RegexLab.sublime-settings\"\n{\n\t$0\n}\n"
+                                }
+                            },
+                            {
+                                "caption": "-"
+                            },
+                            {
+                                "caption": "Key Bindings",
+                                "command": "edit_settings",
+                                "args": {
+                                    "base_file": "${packages}/RegexLab/Default.sublime-keymap",
+                                    "default": "// Key bindings for RegexLab\n[\n\t$0\n]\n"
+                                }
+                            },
+                            {
+                                "caption": "-"
+                            },
+                            {
+                                "caption": "About RegexLab",
+                                "command": "regexlab_about"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]

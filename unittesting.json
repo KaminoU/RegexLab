@@ -1,0 +1,11 @@
+{
+    "verbosity": 2,
+    "output": null,
+    "deferred": true,
+    "async": false,
+    "tests_dir": "tests/ui",
+    "pattern": "test_*.py",
+    "capture_console": true,
+    "reload_package_on_testing": false,
+    "failfast": false
+}
