@@ -21,7 +21,7 @@ from ..core.integrity_manager import IntegrityManager
 from ..core.logger import get_logger
 
 
-class RegexlabGenerateIntegrityCommand(sublime_plugin.ApplicationCommand):  # type: ignore[misc]
+class RegexlabGenerateIntegrityCommand(sublime_plugin.ApplicationCommand):
     """
     Private command to generate integrity files for builtin portfolios.
 
