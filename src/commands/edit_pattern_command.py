@@ -268,7 +268,8 @@ class EditPatternCommand:
 
         def on_done(new_regex: str) -> None:
             """Handle regex input completion with type auto-detection."""
-            new_regex = new_regex.strip()
+            # Do not strip regex! Trailing spaces might be intentional.
+            # new_regex = new_regex.strip()
             if not new_regex:
                 logger.debug("Empty regex provided, no change")
                 self._show_main_status()

@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix integrity check failure when running as a `.sublime-package` (packaged mode). Resources are now correctly extracted to `User/RegexLab/` to allow integrity verification.
+- Fix patterns being trimmed of trailing spaces when adding or editing them.
 
 ---
 

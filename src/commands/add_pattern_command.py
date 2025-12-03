@@ -129,7 +129,8 @@ class AddPatternCommand:
         self.logger.debug("Add Pattern: Showing regex input panel")
 
         def on_done(regex: str) -> None:
-            regex = regex.strip()
+            # Do not strip regex! Trailing spaces might be intentional.
+            # regex = regex.strip()
             if not regex:
                 self.logger.debug("Add Pattern: Empty regex, wizard cancelled")
                 return
