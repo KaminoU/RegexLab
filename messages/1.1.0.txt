@@ -1,0 +1,6 @@
+Regex Lab v1.1.0
+================
+
+Fixed:
+- Fix integrity check failure when running as a .sublime-package (packaged mode).
+- Fix patterns being trimmed of trailing spaces when adding or editing them.

@@ -2,7 +2,7 @@
 
 [project]
 name = "RegexLab"
-version = "1.0.0-dev"
+version = "1.1.0"
 description = "Save and manage your regex patterns in portfolios for Sublime Text 4"
 authors = [{ name = "Michel TRUONG", email = "contact@example.com" }]
 license = { text = "MIT" }
