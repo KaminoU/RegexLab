@@ -50,6 +50,8 @@ def is_builtin_portfolio_path(portfolio_path: str | Path | None) -> bool:
         or "RegexLab\\data\\portfolios" in path_str
         or "Packages/RegexLab" in path_str
         or "Packages\\RegexLab" in path_str
+        or "User/RegexLab/builtin_portfolios" in path_str
+        or "User\\RegexLab\\builtin_portfolios" in path_str
     )
 
 

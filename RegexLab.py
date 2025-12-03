@@ -12,7 +12,7 @@ import sublime_plugin  # pyright: ignore[reportMissingImports]
 if __name__ == "RegexLab.RegexLab":
     # Normal ST loading: use relative imports
     from .src.commands.about_command import RegexlabAboutCommand as AboutCommandImpl
-    from .src.commands.generate_integrity_command import RegexlabGenerateIntegrityCommand  # noqa: F401
+    from .src.commands.generate_integrity_command import RegexlabGenerateIntegrityCommand
     from .src.commands.load_pattern_command import LoadPatternCommand
     from .src.commands.new_portfolio_wizard_command import NewPortfolioWizardCommand
     from .src.commands.portfolio_manager_command import PortfolioManagerCommand
@@ -138,13 +138,15 @@ class RegexLabReloadPortfoliosCommand(sublime_plugin.WindowCommand):
         logger.debug("Cleared existing portfolios from memory")
 
         # STEP 0 - Multi-Portfolio Integrity Verification (v2)
-        regexlab_dir_v2 = packages_path / "RegexLab" / "data" / ".regexlab"  # BUILTIN location!
+        # Use USER directories for integrity check
+        user_regexlab = packages_path / "User" / "RegexLab"
+        regexlab_dir_v2 = user_regexlab / ".regexlab"
         from .src.core.integrity_manager import IntegrityManager
 
         integrity_manager_v2 = IntegrityManager(regexlab_dir_v2)
 
         # A) Built-in portfolios
-        builtin_dir = packages_path / "RegexLab" / "data" / "portfolios"
+        builtin_dir = user_regexlab / "builtin_portfolios"
 
         # Verify integrity if keystore exists
         if integrity_manager_v2.keystore_file.exists():
@@ -181,9 +183,7 @@ class RegexLabReloadPortfoliosCommand(sublime_plugin.WindowCommand):
             try:
                 # First builtin portfolio becomes the "builtin principal" (backward compat)
                 set_as_builtin_flag = is_builtin and first_builtin
-                service.portfolio_manager.load_portfolio(
-                    portfolio_path, set_as_builtin=set_as_builtin_flag, reload=True
-                )
+                service.portfolio_manager.load_portfolio(portfolio_path, set_as_builtin=set_as_builtin_flag, reload=True)
                 if is_builtin and first_builtin:
                     first_builtin = False
                 loaded_count += 1
@@ -196,10 +196,62 @@ class RegexLabReloadPortfoliosCommand(sublime_plugin.WindowCommand):
             self.window.status_message(f"RegexLab: Successfully reloaded {loaded_count} portfolio(s)")
             logger.info("✓ Portfolio reload complete: %s loaded", loaded_count)
         else:
-            self.window.status_message(
-                f"RegexLab: Reloaded {loaded_count} portfolio(s), {failed_count} failed (see console)"
-            )
+            self.window.status_message(f"RegexLab: Reloaded {loaded_count} portfolio(s), {failed_count} failed (see console)")
             logger.warning("⚠ Portfolio reload: %s loaded, %s failed", loaded_count, failed_count)
+
+
+def ensure_user_resources(logger) -> None:
+    """
+    Ensure builtin resources are extracted to User/RegexLab.
+
+    This is critical for Packaged mode (ZIP) where we cannot read/write
+    files directly inside the package. We extract them to User/RegexLab
+    to allow IntegrityManager to work with real files.
+    """
+    from pathlib import Path
+
+    packages_path = Path(sublime.packages_path())
+    user_regexlab = packages_path / "User" / "RegexLab"
+    user_regexlab_data = user_regexlab / ".regexlab"
+    user_portfolios_dir = user_regexlab / "builtin_portfolios"  # Separate from custom portfolios
+
+    user_regexlab_data.mkdir(parents=True, exist_ok=True)
+    user_portfolios_dir.mkdir(parents=True, exist_ok=True)
+
+    # 1. Extract Integrity Files (.regexlab/*)
+    integrity_files = ["rxl.kst", "salt.key"]
+    for filename in integrity_files:
+        dest_path = user_regexlab_data / filename
+        if not dest_path.exists():
+            try:
+                # Try to load from package
+                resource_path = f"Packages/RegexLab/data/.regexlab/{filename}"
+                content = sublime.load_binary_resource(resource_path)
+                dest_path.write_bytes(content)
+                logger.debug("Extracted %s to User directory", filename)
+            except Exception as e:
+                logger.warning("Could not extract %s: %s", filename, e)
+
+    # 2. Extract Builtin Portfolios (data/portfolios/*)
+    # We need to list them first. In packaged mode, we can't glob.
+    # So we use find_resources.
+    resources = sublime.find_resources("*.json")
+    builtin_resources = [r for r in resources if r.startswith("Packages/RegexLab/data/portfolios/")]
+
+    for resource in builtin_resources:
+        filename = resource.split("/")[-1]
+        dest_path = user_portfolios_dir / filename
+
+        # Only extract if not exists (to avoid overwriting user changes if we allowed them)
+        # BUT for builtin portfolios, we might want to force update?
+        # For now, let's extract if missing, IntegrityManager will handle the rest.
+        if not dest_path.exists():
+            try:
+                content_str = sublime.load_resource(resource)
+                dest_path.write_text(content_str, encoding="utf-8")
+                logger.debug("Extracted %s to User directory", filename)
+            except Exception as e:
+                logger.error("Could not extract %s: %s", filename, e)
 
 
 def plugin_loaded() -> None:
@@ -221,21 +273,27 @@ def plugin_loaded() -> None:
 
     from .src.core.integrity_manager import IntegrityManager
     from .src.core.logger import get_logger
-    from .src.core.settings_manager import SettingsManager
     from .src.services.portfolio_service import PortfolioService
 
     logger = get_logger()
-    settings = SettingsManager.get_instance()
     service = PortfolioService()
     packages_path = Path(sublime.packages_path())
 
     logger.info("RegexLab - Auto-Discovery Mode")
     logger.debug("Packages path: %s", packages_path)
 
-    # ========== STEP 0: Verify builtin portfolios integrity (v2) ==========
+    # ========== STEP 0: Ensure User Resources (Fix for Packaged Mode) ==========
+    ensure_user_resources(logger)
+
+    # Define user_regexlab here to avoid UnboundLocalError/Pylance issues
+    user_regexlab = packages_path / "User" / "RegexLab"
+
+    # ========== STEP 1: Verify builtin portfolios integrity (v2) ==========
     try:
-        builtin_dir = packages_path / "RegexLab" / "data" / "portfolios"
-        regexlab_dir_v2 = packages_path / "RegexLab" / "data" / ".regexlab"  # BUILTIN location!
+        # Use USER directories for integrity check
+        builtin_dir = user_regexlab / "builtin_portfolios"
+        regexlab_dir_v2 = user_regexlab / ".regexlab"
+
         integrity_manager_v2 = IntegrityManager(regexlab_dir_v2)
 
         if integrity_manager_v2.keystore_file.exists():
@@ -251,8 +309,7 @@ def plugin_loaded() -> None:
     except Exception as e:
         logger.error("Multi-portfolio integrity check failed: %s", e)
 
-    # ========== STEP 1: Ensure User/RegexLab directories exist ==========
-    user_regexlab = packages_path / "User" / "RegexLab"
+    # ========== STEP 2: Ensure User/RegexLab directories exist ==========
     portfolios_dir = user_regexlab / "portfolios"
     disabled_dir = user_regexlab / "disabled_portfolios"
 
@@ -260,20 +317,21 @@ def plugin_loaded() -> None:
     disabled_dir.mkdir(parents=True, exist_ok=True)
     logger.debug("User directories ensured: portfolios/ and disabled_portfolios/")
 
-    # ========== STEP 2: Discover all portfolios to load ==========
+    # ========== STEP 3: Discover all portfolios to load ==========
     portfolios_to_load = []
     loaded_count = 0
     failed_count = 0
     error_messages = []
 
-    # A) Built-in portfolios (RegexLab/data/portfolios/*.json)
-    builtin_dir = packages_path / "RegexLab" / "data" / "portfolios"
-    builtin_dir.mkdir(parents=True, exist_ok=True)  # Ensure directory exists
+    # A) Built-in portfolios (Now loaded from User/RegexLab/builtin_portfolios)
+    # We use the extracted files which are verified/restored
+    builtin_dir = user_regexlab / "builtin_portfolios"
+    builtin_dir.mkdir(parents=True, exist_ok=True)
 
     builtin_files = sorted(builtin_dir.glob("*.json"))
     logger.debug("Found %s builtin portfolio(s) in: %s", len(builtin_files), builtin_dir)
 
-    # Add all builtin portfolios found (auto-discovery, no hardcoded names)
+    # Add all builtin portfolios found
     for filepath in builtin_files:
         portfolios_to_load.append((filepath, True))  # (path, is_builtin)
 
@@ -291,10 +349,9 @@ def plugin_loaded() -> None:
 
     logger.info("Total portfolios to load: %s", len(portfolios_to_load))
 
-    # ========== STEP 3: Load all discovered portfolios ==========
-    regexlab_dir = packages_path / "RegexLab" / "data" / ".regexlab"
-    integrity_manager = IntegrityManager(regexlab_dir)
-    builtin_integrity_checked = False
+    # ========== STEP 4: Load all discovered portfolios ==========
+    # Note: We don't need to re-check integrity here, it was done in Step 1
+    builtin_integrity_checked = True
 
     for i, (portfolio_path, is_builtin) in enumerate(portfolios_to_load):
         logger.debug("Loading portfolio %s/%s: %s", i + 1, len(portfolios_to_load), portfolio_path.name)
@@ -369,8 +426,6 @@ def plugin_loaded() -> None:
         if len(error_messages) > 3:
             display_errors.append(f"\n... and {len(error_messages) - 3} more error(s).")
 
-        error_dialog = "RegexLab: Portfolio Loading Errors\n\n" + "\n\n━━━━━━━━━━━━━━━━━━━━━━━━\n\n".join(
-            display_errors
-        )
+        error_dialog = "RegexLab: Portfolio Loading Errors\n\n" + "\n\n━━━━━━━━━━━━━━━━━━━━━━━━\n\n".join(display_errors)
 
         sublime.error_message(error_dialog)

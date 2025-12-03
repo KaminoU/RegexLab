@@ -150,8 +150,8 @@
     // === Debug & Logging ===
     // Options: "DEBUG", "INFO", "WARNING", "ERROR"
     // DEBUG: Detailed diagnostic information
-    // INFO: General informational messages (default)
-    // WARNING: Warning messages
+    // INFO: General informational messages
+    // WARNING: Warning messages (default)
     // ERROR: Error messages only
-    "log_level": "INFO"
+    "log_level": "WARNING"
 }

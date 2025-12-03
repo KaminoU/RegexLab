@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix integrity check failure when running as a `.sublime-package` (packaged mode). Resources are now correctly extracted to `User/RegexLab/` to allow integrity verification.
+
 ---
 
 ## [1.0.0] - 2025-10-29
