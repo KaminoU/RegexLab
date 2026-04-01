@@ -15,6 +15,7 @@ import json
 import os
 import tempfile
 import unittest
+from datetime import datetime
 
 from src.core.models import Portfolio
 from src.core.portfolio_manager import PortfolioManager
@@ -416,7 +417,7 @@ class TestPortfolioServiceSave(unittest.TestCase):
 
         # Check timestamp was updated
         self.assertNotEqual(portfolio.updated, "2000-01-01T00:00:00")
-        self.assertIn("2025", portfolio.updated)  # Current year
+        self.assertIn(str(datetime.now().year), portfolio.updated)
 
     def test_save_portfolio_creates_file(self) -> None:
         """Test that save_portfolio creates the file."""
