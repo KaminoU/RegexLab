@@ -79,7 +79,11 @@ Package Control remembers the custom repository, so future updates come through 
 
 3. **Copy** the `RegexLab` folder into `Packages`
 
+    **ZIP download**: the extracted folder is named `RegexLab-main` (or `RegexLab-<version>`); rename it to `RegexLab`.
+
 4. **Restart** Sublime Text – the built-in portfolios load automatically on startup. 🎉
+
+**Updating a manual installation**: run `git pull` in the `RegexLab` folder, or replace the folder with a newer download, then restart Sublime Text. Do not keep a manual copy next to a Package Control install: a `RegexLab` folder in `Packages` overrides the installed package.
 
 ---
 
@@ -153,6 +157,7 @@ User/RegexLab/disabled_portfolios/*.json
 **Enable/disable portfolios:**
 - Use Portfolio Manager (`Ctrl+K, Ctrl+P`) → "Enable/Disable Portfolio"
 - Or drag `.json` files between `portfolios/` and `disabled_portfolios/`
+- Disabling needs a file name that ends with `.json` in lowercase; otherwise rename the file, then run **RegexLab: Reload Portfolios**
 
 **Create new portfolio:**
 - Command Palette → "RegexLab: New Portfolio"

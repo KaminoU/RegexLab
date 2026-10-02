@@ -3,7 +3,6 @@ Unit tests for src/core/helpers.py utility functions.
 
 Tests cover:
 - normalize_portfolio_name: Unicode, diacritics, special chars, edge cases
-- find_portfolio_file_by_name: File search with validation callback
 - format_aligned_summary: Summary formatting with alignment
 - format_quick_panel_line: Quick panel line formatting with padding
 
@@ -12,13 +11,11 @@ NOTE: Tests for show_persistent_status() excluded (requires import sublime).
 
 from __future__ import annotations
 
-from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 from src.core.helpers import (
     deep_merge_dicts,
-    find_portfolio_file_by_name,
     format_aligned_summary,
     format_centered_separator,
     format_quick_panel_line,
@@ -98,101 +95,6 @@ class TestNormalizePortfolioName:
         """Complex real-world example."""
         assert normalize_portfolio_name("Tëst Pörtfolio!!!") == "test_portfolio.json"
         assert normalize_portfolio_name("Café René (2024)") == "cafe_rene_2024.json"
-
-
-# ============================================================================
-# find_portfolio_file_by_name() Tests
-# ============================================================================
-
-
-class TestFindPortfolioFileByName:
-    """Tests for find_portfolio_file_by_name() - File search with validation."""
-
-    def test_find_portfolio_file_found(self, tmp_path: Path):
-        """Should find portfolio file by exact name match."""
-        # Create test portfolio
-        portfolio_file = tmp_path / "test_portfolio.json"
-        portfolio_file.write_text('{"name": "Test Portfolio", "patterns": []}')
-
-        # Validation callback (always valid)
-        def validate(path: str) -> tuple[bool, dict]:
-            import json
-
-            data = json.loads(Path(path).read_text())
-            return True, data
-
-        # Search
-        result = find_portfolio_file_by_name(tmp_path, "Test Portfolio", validate)
-
-        assert result == portfolio_file
-
-    def test_find_portfolio_file_not_found(self, tmp_path: Path):
-        """Should return None if no matching portfolio."""
-        # Create test portfolio with different name
-        portfolio_file = tmp_path / "test_portfolio.json"
-        portfolio_file.write_text('{"name": "Wrong Name", "patterns": []}')
-
-        # Validation callback
-        def validate(path: str) -> tuple[bool, dict]:
-            import json
-
-            data = json.loads(Path(path).read_text())
-            return True, data
-
-        # Search for non-existent portfolio
-        result = find_portfolio_file_by_name(tmp_path, "Test Portfolio", validate)
-
-        assert result is None
-
-    def test_find_portfolio_file_invalid_json(self, tmp_path: Path):
-        """Should skip files that fail validation."""
-        # Create invalid JSON file
-        portfolio_file = tmp_path / "test_portfolio.json"
-        portfolio_file.write_text("INVALID JSON")
-
-        # Validation callback (returns False for invalid)
-        def validate(path: str) -> tuple[bool, dict]:
-            try:
-                import json
-
-                data = json.loads(Path(path).read_text())
-                return True, data
-            except Exception:
-                return False, {}
-
-        # Search
-        result = find_portfolio_file_by_name(tmp_path, "Test Portfolio", validate)
-
-        assert result is None
-
-    def test_find_portfolio_file_multiple_files(self, tmp_path: Path):
-        """Should find correct file among multiple portfolios."""
-        # Create multiple portfolios
-        (tmp_path / "portfolio1.json").write_text('{"name": "Portfolio 1", "patterns": []}')
-        (tmp_path / "portfolio2.json").write_text('{"name": "Target Portfolio", "patterns": []}')
-        (tmp_path / "portfolio3.json").write_text('{"name": "Portfolio 3", "patterns": []}')
-
-        # Validation callback
-        def validate(path: str) -> tuple[bool, dict]:
-            import json
-
-            data = json.loads(Path(path).read_text())
-            return True, data
-
-        # Search
-        result = find_portfolio_file_by_name(tmp_path, "Target Portfolio", validate)
-
-        assert result == tmp_path / "portfolio2.json"
-
-    def test_find_portfolio_file_empty_directory(self, tmp_path: Path):
-        """Should return None if directory has no JSON files."""
-
-        def validate(path: str) -> tuple[bool, dict]:
-            return True, {}
-
-        result = find_portfolio_file_by_name(tmp_path, "Test Portfolio", validate)
-
-        assert result is None
 
 
 # ============================================================================

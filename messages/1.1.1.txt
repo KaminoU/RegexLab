@@ -1,0 +1,18 @@
+Regex Lab v1.1.1
+================
+
+Security:
+- Delete Portfolio and Disable Portfolio now act only on the file a
+  portfolio was loaded from. A crafted "name" in a shared portfolio could
+  make Delete remove a .json file outside the portfolios folder (issue #16).
+
+Fixed:
+- Exporting a portfolio no longer raises TypeError when "log_level" is
+  "DEBUG" (issue #17).
+- Updating or re-enabling RegexLab while Sublime Text is running no longer
+  shows "No portfolios could be loaded!", and the new version is active
+  without a restart.
+
+Changed:
+- Disable Portfolio refuses a file whose name does not end with ".json" in
+  lowercase: rename the file, then run "RegexLab: Reload Portfolios".

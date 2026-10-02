@@ -44,11 +44,11 @@ from ..core.constants import (
     ICON_SUCCESS,
 )
 from ..core.helpers import (
-    find_portfolio_file_by_name,
     format_aligned_summary,
     format_centered_separator,
     format_quick_panel_line,
     is_builtin_portfolio_path,
+    is_path_directly_in_directory,
     normalize_portfolio_name,
     pluralize,
 )
@@ -737,6 +737,98 @@ class PortfolioManagerCommand:
             window.status_message(f"Regex Lab: Error enabling portfolio - {e}")
             self.logger.error("Error enabling portfolio '%s' from %s - %s: %s", name, filepath, type(e).__name__, e)
 
+    def _checked_portfolio_file(
+        self,
+        window: sublime.Window,
+        action: str,
+        portfolio_name: str,
+        file_path: Path | None,
+        folder: Path,
+        remedy: str,
+    ) -> Path | None:
+        """
+        Check the file that an action is about to delete or move, and refuse the action if needed.
+
+        The file must be known, sit directly in its folder, still exist and still hold the portfolio: it may
+        have been replaced since its path was recorded, so it is read again (_portfolio_file_content_error). A
+        symlink placed in the folder is a file of it: if the action goes on, it deletes or moves the link, never
+        its target. A refusal is logged as a warning, then shown in the status bar, with its reason. Only the
+        errors of reading and decoding the file make a refusal: another error, such as MemoryError on a file too
+        large to read, propagates.
+
+        Args:
+            window: Sublime Text window instance
+            action: Name of the action, for the log
+            portfolio_name: Name of the portfolio
+            file_path: File of the portfolio, or None if none is known
+            folder: Folder that must hold the file
+            remedy: What the user can do when the file no longer holds the portfolio
+
+        Returns:
+            The file if the action may go on, None if it was refused
+        """
+        import os
+
+        if file_path is None:
+            error_msg = f"No file recorded for portfolio '{portfolio_name}'"
+        elif not is_path_directly_in_directory(file_path, folder):
+            error_msg = f"File of portfolio '{portfolio_name}' is outside {folder.name}/: {file_path}"
+        elif not os.path.lexists(str(file_path)):
+            error_msg = f"Portfolio file does not exist: {file_path}"
+        else:
+            content_error = self._portfolio_file_content_error(portfolio_name, file_path, remedy)
+            if content_error is None:
+                return file_path
+            error_msg = content_error
+
+        self.logger.warning("%s refused: %s", action, error_msg)
+        window.status_message(f"Regex Lab: {error_msg}")
+        return None
+
+    def _portfolio_file_content_error(self, portfolio_name: str, file_path: Path, remedy: str) -> str | None:
+        """
+        Read a portfolio file again, and tell why it no longer holds the portfolio, if it does not.
+
+        The re-read settles the file's identity, not its validity. The file holds the portfolio if it is a regular
+        file whose content, decoded as UTF-8, is a JSON object whose "name" is exactly portfolio_name (for a
+        string: no case folding, no Unicode normalization). No pattern is built and no other field is checked: the
+        plugin saves patterns that loading would reject (Edit Pattern neither compiles a regex nor checks that a
+        pattern name is unique, Use Selection does not check that a pattern name is unique either, and Toggle
+        Read-Only writes the portfolio back as it stands in memory), and lists a disabled portfolio on other criteria
+        than loading.
+
+        The reasons it gives:
+        - a path that is not a regular file (a directory, a FIFO, a dangling symlink) is unreadable, "not a
+          regular file", and is not opened;
+        - a file that cannot be read, decoded as UTF-8 or parsed as JSON, or whose JSON is nested too deep, is
+          unreadable, with the name of the error's class (an OSError such as PermissionError, a ValueError such as
+          UnicodeDecodeError or JSONDecodeError, or RecursionError);
+        - JSON that is not an object is unreadable, "not a JSON object";
+        - an object without "name", or with another name, no longer holds the portfolio.
+
+        Args:
+            portfolio_name: Name the file must carry
+            file_path: File to read
+            remedy: What the user can do when the file no longer holds the portfolio
+
+        Returns:
+            None if the file still holds the portfolio, else the reason why it does not
+        """
+        import json
+
+        try:
+            if not file_path.is_file():
+                return f"File of portfolio '{portfolio_name}' is unreadable: {file_path} (not a regular file)"
+            with file_path.open("r", encoding="utf-8") as f:
+                data = json.load(f)
+        except (OSError, ValueError, RecursionError) as e:
+            return f"File of portfolio '{portfolio_name}' is unreadable: {file_path} ({type(e).__name__})"
+        if not isinstance(data, dict):
+            return f"File of portfolio '{portfolio_name}' is unreadable: {file_path} (not a JSON object)"
+        if data.get("name") != portfolio_name:
+            return f"File no longer holds portfolio '{portfolio_name}' ({remedy}): {file_path}"
+        return None
+
     def _disable_portfolio(self, window: sublime.Window, portfolio: Portfolio) -> None:
         """
         Disable a loaded portfolio by moving it to disabled_portfolios/ folder.
@@ -749,51 +841,51 @@ class PortfolioManagerCommand:
             window: Sublime Text window instance
             portfolio: Portfolio object to disable
         """
+        import os
         import shutil
 
         try:
-            # Get portfolio file path from portfolio manager
-            # Need to find the source file in portfolios/ folder
             packages_path = Path(window.extract_variables()["packages"])
             portfolios_dir = packages_path / "User" / "RegexLab" / "portfolios"
 
-            # Find the portfolio file by name (should match portfolio.name)
-            # Convert portfolio name to filename using Unicode-aware normalization
-            # Note: This is a heuristic - ideally we'd store the original filepath in Portfolio object
-            portfolio_filename = normalize_portfolio_name(portfolio.name)
-            source_path = portfolios_dir / portfolio_filename
+            # Act on the path recorded when the portfolio was loaded, not on a path built here
+            # from its name, which comes from a JSON file meant to be shared
+            source_path = self._checked_portfolio_file(
+                window,
+                "Disable portfolio",
+                portfolio.name,
+                self.portfolio_service.portfolio_manager._portfolio_paths.get(portfolio.name),
+                portfolios_dir,
+                "reload portfolios",
+            )
+            if source_path is None:
+                return
 
-            # Check if file exists (validation)
-            if not source_path.exists():
-                # Fallback: search all .json files in portfolios/ directory
-                self.logger.debug("Portfolio file not found at expected path: %s", source_path)
-                self.logger.debug("Searching for portfolio file in %s", portfolios_dir)
-
-                found_file = find_portfolio_file_by_name(
-                    portfolios_dir, portfolio.name, self.portfolio_service.validate_portfolio_file
+            # The list of disabled portfolios shows a file only if its name ends with ".json"
+            # (PortfolioService.get_disabled_portfolios): a file it would not show is not moved there
+            if not source_path.name.endswith(".json"):
+                error_msg = (
+                    f"File of portfolio '{portfolio.name}' must have a name that ends with \".json\" in lowercase "
+                    f"(rename it, then reload portfolios): {source_path}"
                 )
-
-                if found_file is None:
-                    error_msg = f"Portfolio file not found for '{portfolio.name}'"
-                    window.status_message(f"Regex Lab: {error_msg}")
-                    self.logger.error("Disable portfolio failed: %s", error_msg)
-                    return
-
-                source_path = found_file
-                self.logger.debug("Found portfolio file: %s", source_path)
+                self.logger.warning("Disable portfolio refused: %s", error_msg)
+                window.status_message(f"Regex Lab: {error_msg}")
+                return
 
             # Create destination directory
             disabled_dir = packages_path / "User" / "RegexLab" / "disabled_portfolios"
             disabled_dir.mkdir(parents=True, exist_ok=True)
+            # The file keeps its name, which ends with ".json": the list of disabled portfolios shows it
             dest_path = disabled_dir / source_path.name
 
             self.logger.debug("Portfolio Manager: Moving portfolio from %s to %s", source_path, dest_path)
 
-            # Check if destination already exists (conflict)
-            if dest_path.exists():
-                error_msg = f"A disabled portfolio with filename '{source_path.name}' already exists"
+            # Check if destination already exists (conflict): any entry counts, a dangling link included,
+            # since moving the file onto it could write through the link
+            if os.path.lexists(str(dest_path)):
+                error_msg = f"An entry named '{source_path.name}' already exists in disabled_portfolios/"
+                self.logger.warning("Disable portfolio refused: %s", error_msg)
                 window.status_message(f"Regex Lab: {error_msg}")
-                self.logger.error("Disable portfolio failed: %s", error_msg)
                 return
 
             # Move file
@@ -997,38 +1089,20 @@ class PortfolioManagerCommand:
 
             # Determine file path based on whether it's loaded or disabled
             if filepath:
-                # Disabled portfolio - filepath provided directly
-                file_to_delete = Path(filepath)
-                self.logger.debug("Deleting disabled portfolio from: %s", file_to_delete)
+                # Disabled portfolio - filepath comes from the scan of disabled_portfolios/,
+                # which runs again whenever the Portfolio Manager opens
+                folder = packages_path / "User" / "RegexLab" / "disabled_portfolios"
+                known_path: Path | None = Path(filepath)
+                remedy = "reopen the Portfolio Manager"
             else:
-                # Loaded portfolio - find in portfolios/ folder
-                portfolios_dir = packages_path / "User" / "RegexLab" / "portfolios"
-                portfolio_filename = f"{portfolio_name.lower().replace(' ', '_')}.json"
-                file_to_delete = portfolios_dir / portfolio_filename
+                # Loaded portfolio - act on the path recorded when it was loaded, not on a path built
+                # here from its name, which comes from a JSON file meant to be shared
+                folder = packages_path / "User" / "RegexLab" / "portfolios"
+                known_path = self.portfolio_service.portfolio_manager._portfolio_paths.get(portfolio_name)
+                remedy = "reload portfolios"
 
-                # Fallback: search for exact match if heuristic fails
-                if not file_to_delete.exists():
-                    self.logger.debug("Portfolio file not found at expected path: %s", file_to_delete)
-                    self.logger.debug("Searching for portfolio file in %s", portfolios_dir)
-
-                    found_file = find_portfolio_file_by_name(
-                        portfolios_dir, portfolio_name, self.portfolio_service.validate_portfolio_file
-                    )
-
-                    if found_file is None:
-                        error_msg = f"Portfolio file not found for '{portfolio_name}'"
-                        window.status_message(f"Regex Lab: {error_msg}")
-                        self.logger.error("Delete failed: %s", error_msg)
-                        return
-
-                    file_to_delete = found_file
-                    self.logger.debug("Found portfolio file: %s", file_to_delete)
-
-            # Verify file exists before deletion
-            if not file_to_delete.exists():
-                error_msg = f"Portfolio file does not exist: {file_to_delete}"
-                window.status_message(f"Regex Lab: {error_msg}")
-                self.logger.error("Delete failed: %s", error_msg)
+            file_to_delete = self._checked_portfolio_file(window, "Delete", portfolio_name, known_path, folder, remedy)
+            if file_to_delete is None:
                 return
 
             self.logger.debug("Deleting portfolio file: %s", file_to_delete)

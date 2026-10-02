@@ -24,7 +24,7 @@ jobs:
 
       # Guardrail: keep Ruff upfront so import/format regressions fail fast on every PR.
       - name: Run Ruff linter
-        run: ruff check src/ tests/ --output-format=github --diff
+        run: ruff check src/ tests/ --output-format=github
 
       - name: Run Ruff formatter check
         run: ruff format --check src/ tests/

@@ -10,13 +10,17 @@ Tests cover:
 """
 
 import json
+import shutil
 import tempfile
+from io import StringIO
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
+from src.core.logger import Logger
 from src.core.models import Pattern, PatternType, Portfolio
 from src.core.portfolio_manager import PortfolioManager
+from src.core.settings_manager import SettingsManager
 from src.services.portfolio_service import PortfolioService
 
 
@@ -277,6 +281,51 @@ class TestPortfolioServiceExportImport:
         assert success is True
         assert "exported successfully" in message
         assert Path(dest_path).exists()
+
+
+class TestPortfolioServiceExportDebugLog:
+    """Issue #17: with "log_level" at "DEBUG", exporting a portfolio logs its destination instead of failing."""
+
+    def setup_method(self) -> None:
+        """Reset the singleton and create a throwaway directory, removed by teardown_method."""
+        PortfolioManager.reset_instance()
+        self.service = PortfolioService()
+        self.temp_dir = tempfile.mkdtemp()
+        self.temp_path = Path(self.temp_dir)
+
+    def teardown_method(self) -> None:
+        """Remove the throwaway directory."""
+        shutil.rmtree(self.temp_dir, ignore_errors=True)
+
+    def test_export_portfolio_to_path_at_debug_level_logs_destination(self) -> None:
+        """
+        At DEBUG level, export_portfolio_to_path raises nothing, exports the portfolio, and its debug line ends with
+        the destination.
+
+        The Logger formats a message with message % args only when its level is enabled. Before the fix, the format of
+        that line held "{}" where "%s" belonged: three placeholders for four arguments, so the export raised TypeError.
+        """
+        settings = MagicMock(spec=SettingsManager)
+        settings.get.return_value = "DEBUG"
+        pattern = Pattern(name="Test", regex=r"\d+", type=PatternType.STATIC)
+        portfolio = Portfolio(name="Export Test", patterns=[pattern])
+        dest_path = str(self.temp_path / "exported_debug.json")
+
+        with patch("src.services.portfolio_service.logger", Logger(settings_manager=settings)), patch(
+            "sys.stdout", new_callable=StringIO
+        ) as mock_stdout:
+            try:
+                success, message = self.service.export_portfolio_to_path(portfolio, dest_path)
+            except Exception as e:
+                pytest.fail(f"an exception escaped the export: {e!r}")
+            output = mock_stdout.getvalue()
+
+        assert success is True, message
+        assert Path(dest_path).exists()
+        export_lines = [line for line in output.splitlines() if line.startswith("[RegexLab:DEBUG] Export portfolio ")]
+        assert export_lines == [
+            f"[RegexLab:DEBUG] Export portfolio 'Export Test' (readonly: False, 1 patterns) to: {dest_path}"
+        ]
 
 
 class TestPortfolioServiceQuickWins:

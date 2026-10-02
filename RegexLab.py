@@ -5,11 +5,20 @@ A comprehensive plugin for managing and using regex patterns with portfolios,
 dynamic variables, and seamless Find panel integration.
 """
 
+import sys
+
 import sublime  # pyright: ignore[reportMissingImports]
 import sublime_plugin  # pyright: ignore[reportMissingImports]
 
 # Support both ST package loading (RegexLab.RegexLab) and direct execution
 if __name__ == "RegexLab.RegexLab":
+    # Sublime Text reloads the plugin by running this module again (after an update, or when the package is
+    # enabled again), but keeps in sys.modules the src modules it imported: forget them first, so that the imports
+    # below load the current code with a fresh state, the portfolio manager's singleton included
+    _src_package = __name__.rpartition(".")[0] + ".src"
+    for _module_name in [name for name in sys.modules if name == _src_package or name.startswith(_src_package + ".")]:
+        del sys.modules[_module_name]
+
     # Normal ST loading: use relative imports
     from .src.commands.about_command import RegexlabAboutCommand as AboutCommandImpl
     from .src.commands.generate_integrity_command import RegexlabGenerateIntegrityCommand

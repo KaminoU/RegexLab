@@ -2,7 +2,7 @@
 
 [project]
 name = "RegexLab"
-version = "1.1.0"
+version = "1.1.1"
 description = "Save and manage your regex patterns in portfolios for Sublime Text 4"
 authors = [{ name = "Michel TRUONG", email = "contact@example.com" }]
 license = { text = "MIT" }
@@ -59,6 +59,8 @@ select = [
     "C4",  # flake8-comprehensions
     "SIM", # flake8-simplify
     "RUF", # Ruff-specific rules
+    "PLE1205", # Pylint: too many arguments for a logging format string
+    "PLE1206", # Pylint: too few arguments for a logging format string
 ]
 
 # Ignore specific rules

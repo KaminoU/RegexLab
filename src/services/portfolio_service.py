@@ -494,7 +494,7 @@ class PortfolioService:
             - If failed: (False, error_message)
         """
         logger.debug(
-            "Export portfolio '%s' (readonly: %s, %s patterns) to: {}",
+            "Export portfolio '%s' (readonly: %s, %s patterns) to: %s",
             portfolio.name,
             portfolio.readonly,
             len(portfolio.patterns),

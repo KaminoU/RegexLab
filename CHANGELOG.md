@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.1] - 2026-10-01
+
+### Security
+
+- Delete Portfolio and Disable Portfolio now act only on the file a portfolio was loaded from. They used to build the file path from the portfolio's `"name"` field: with Delete, a crafted name in a shared portfolio could delete a `.json` file outside the portfolios folder ([#16](https://github.com/KaminoU/RegexLab/issues/16)), and either action could act on another file than the one the portfolio was loaded from. Before acting, the file is read again: it must sit directly in its folder and still hold the portfolio.
+
+### Fixed
+
+- Fix exporting a portfolio raising `TypeError` when `"log_level"` is `"DEBUG"` ([#17](https://github.com/KaminoU/RegexLab/issues/17)).
+- Fix the "No portfolios could be loaded!" error when RegexLab is updated or re-enabled while Sublime Text is running. The plugin now reloads its own modules, so the new version takes effect without a restart.
+
+### Changed
+
+- Disable Portfolio now refuses a file whose name does not end with `.json` in lowercase, which the list of disabled portfolios would not show: rename the file, then run **RegexLab: Reload Portfolios**.
+
+---
+
 ## [1.1.0] - 2025-12-03
 
 ### Fixed

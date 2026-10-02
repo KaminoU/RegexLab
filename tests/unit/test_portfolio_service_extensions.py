@@ -249,6 +249,34 @@ class TestPortfolioServiceDiscovery(unittest.TestCase):
         self.assertEqual(filepath, valid_path)
         self.assertEqual(metadata["name"], "Valid")
 
+    def _write_disabled(self, filename: str, name: str) -> None:
+        """Write a minimal valid portfolio that carries name to disabled_portfolios/filename."""
+        disabled_dir = os.path.join(self.temp_dir, "User", "RegexLab", "disabled_portfolios")
+        os.makedirs(disabled_dir, exist_ok=True)
+        with open(os.path.join(disabled_dir, filename), "w", encoding="utf-8") as f:
+            json.dump({"name": name, "description": "", "version": "1.0.0", "patterns": []}, f)
+
+    def test_get_disabled_portfolios_skips_name_not_ending_with_json(self) -> None:
+        """A valid portfolio in a file whose name does not end with ".json" is not listed."""
+        self._write_disabled("v.json", "Vee")
+        self._write_disabled("w.txt", "Wye")
+
+        disabled = self.service.get_disabled_portfolios(self.packages_path)
+
+        listed = [(os.path.basename(path), metadata["name"]) for path, metadata in disabled]
+        self.assertEqual(listed, [("v.json", "Vee")])
+
+    def test_get_disabled_portfolios_needs_dot_json_at_the_end_of_the_name(self) -> None:
+        """w.json.bak and wjson are not listed: the name must end with ".json", dot included."""
+        self._write_disabled("v.json", "Vee")
+        self._write_disabled("w.json.bak", "Bak")
+        self._write_disabled("wjson", "Nodot")
+
+        disabled = self.service.get_disabled_portfolios(self.packages_path)
+
+        listed = [(os.path.basename(path), metadata["name"]) for path, metadata in disabled]
+        self.assertEqual(listed, [("v.json", "Vee")])
+
 
 class TestPortfolioServiceLoaded(unittest.TestCase):
     """Test loaded portfolio checks."""
@@ -385,6 +413,29 @@ class TestPortfolioServiceExists(unittest.TestCase):
     def test_portfolio_exists_not_found(self) -> None:
         """Test portfolio_exists returns False for nonexistent portfolio."""
         self.assertFalse(self.service.portfolio_exists("Nonexistent", self.packages_path))
+
+    def _write_active(self, filename: str, name: str) -> None:
+        """Write a minimal valid portfolio that carries name to portfolios/filename, without loading it."""
+        with open(os.path.join(self.portfolio_dir, filename), "w", encoding="utf-8") as f:
+            json.dump({"name": name, "description": "", "version": "1.0.0", "patterns": []}, f)
+
+    def test_portfolio_exists_skips_name_not_ending_with_json(self) -> None:
+        """A valid portfolio in a file whose name does not end with ".json" is not found."""
+        self._write_active("v.json", "Vee")
+        self._write_active("w.txt", "Wye")
+
+        self.assertTrue(self.service.portfolio_exists("Vee", self.packages_path), "portfolios/v.json was not found")
+        self.assertFalse(self.service.portfolio_exists("Wye", self.packages_path), "portfolios/w.txt was found")
+
+    def test_portfolio_exists_needs_dot_json_at_the_end_of_the_name(self) -> None:
+        """Portfolios in w.json.bak and wjson are not found: the name must end with ".json", dot included."""
+        self._write_active("v.json", "Vee")
+        self._write_active("w.json.bak", "Bak")
+        self._write_active("wjson", "Nodot")
+
+        self.assertTrue(self.service.portfolio_exists("Vee", self.packages_path), "portfolios/v.json was not found")
+        self.assertFalse(self.service.portfolio_exists("Bak", self.packages_path), "portfolios/w.json.bak was found")
+        self.assertFalse(self.service.portfolio_exists("Nodot", self.packages_path), "portfolios/wjson was found")
 
 
 class TestPortfolioServiceSave(unittest.TestCase):

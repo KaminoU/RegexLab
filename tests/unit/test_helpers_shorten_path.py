@@ -16,7 +16,7 @@ class TestShortenPathFullMode:
         """Full mode should return string path unchanged."""
         from src.core.helpers import shorten_path
 
-        path = r"C:\Users\miche\Documents\file.json"
+        path = r"C:\Users\user\Documents\file.json"
         result = shorten_path(path, mode="full")
         assert result == path
 
@@ -24,7 +24,7 @@ class TestShortenPathFullMode:
         """Full mode should convert Path object to string."""
         from src.core.helpers import shorten_path
 
-        path = Path(r"C:\Users\miche\Documents\file.json")
+        path = Path(r"C:\Users\user\Documents\file.json")
         result = shorten_path(path, mode="full")
         assert result == str(path)
 

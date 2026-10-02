@@ -6,13 +6,11 @@ Contains common utility functions used across multiple modules.
 
 from __future__ import annotations
 
+import os
 import re
 import unicodedata
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
-
-if TYPE_CHECKING:
-    from collections.abc import Callable
+from typing import Any
 
 
 def is_builtin_portfolio_path(portfolio_path: str | Path | None) -> bool:
@@ -144,36 +142,40 @@ def format_centered_separator(label: str, panel_width: int) -> str:
     return f"{'─' * padding_left}{label_with_spaces}{'─' * padding_right}"
 
 
-def find_portfolio_file_by_name(
-    portfolios_dir: Path,
-    portfolio_name: str,
-    validate_func: Callable[[str], tuple[bool, dict[str, Any] | str]],
-) -> Path | None:
+def is_path_directly_in_directory(path: str | Path, directory: str | Path) -> bool:
     """
-    Find portfolio file by name in directory.
+    Tell whether a path names an entry directly in a directory.
 
-    Searches all .json files in directory and validates them using provided function.
-    Returns first matching portfolio file or None if not found.
+    The parent of the path and the directory are compared once ``os.path.realpath`` has resolved both:
+    symlinks followed, ``..`` and relative parts removed. The last component is not resolved, so a symlink
+    placed in the directory is an entry of it wherever it points: deleting or moving it acts on the link,
+    never on its target. A last component that is empty, ``.`` or ``..`` names no entry of the directory.
+
+    Windows rewrites some names before it opens them (it removes trailing dots and spaces, and some names
+    are devices). They are compared as written: on Windows, the answer does not hold for a path that goes
+    through such a name.
 
     Args:
-        portfolios_dir: Directory to search for portfolio files
-        portfolio_name: Target portfolio name to match
-        validate_func: Function to validate portfolio files (returns tuple of valid flag and result)
+        path: Path to check (it does not need to exist)
+        directory: Directory that must hold it
 
     Returns:
-        Path to matching portfolio file or None if not found
+        True if the resolved parent of the path is the resolved directory
 
-    Example:
-        >>> validate = lambda path: portfolio_service.validate_portfolio_file(path)
-        >>> file = find_portfolio_file_by_name(Path("/portfolios"), "MyPortfolio", validate)
-        >>> if file:
-        ...     print(f"Found: {file}")
+    Examples:
+        >>> is_path_directly_in_directory(Path("/data/portfolios/mine.json"), Path("/data/portfolios"))
+        True
+        >>> is_path_directly_in_directory(Path("/data/portfolios/../victim.json"), Path("/data/portfolios"))
+        False
+        >>> is_path_directly_in_directory(Path("/data/portfolios/sub/mine.json"), Path("/data/portfolios"))
+        False
     """
-    for json_file in portfolios_dir.glob("*.json"):
-        valid, result = validate_func(str(json_file))
-        if valid and isinstance(result, dict) and result.get("name") == portfolio_name:
-            return json_file
-    return None
+    parent, name = os.path.split(str(path))
+    if name in ("", os.curdir, os.pardir):
+        return False
+    resolved_parent = os.path.realpath(parent or os.curdir)
+    resolved_directory = os.path.realpath(str(directory))
+    return os.path.normcase(resolved_parent) == os.path.normcase(resolved_directory)
 
 
 def pluralize(count: int, singular: str, plural: str | None = None) -> str:
@@ -287,7 +289,7 @@ def shorten_path(
 
         >>> # Full mode
         >>> shorten_path("C:\\...\\file.json", mode="full")
-        'C:\\Users\\miche\\...\\file.json'
+        'C:\\Users\\user\\...\\file.json'
     """
     # Convert to string if Path object
     path_str = str(path)

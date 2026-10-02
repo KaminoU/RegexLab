@@ -148,7 +148,7 @@ DEFAULT_LOG_LEVEL: str = "INFO"
 DEFAULT_PATH_DISPLAY_MODE: str = "relative"
 
 # Number of directory levels to keep at start/end for "ellipsis" mode
-# Example with ellipsis_parts=2: C:\Users\miche\...\RegexLab\portfolios\file.json
+# Example with ellipsis_parts=2: C:\Users\user\...\RegexLab\portfolios\file.json
 DEFAULT_PATH_ELLIPSIS_PARTS: int = 2
 
 # =============================================================================
