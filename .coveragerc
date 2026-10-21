@@ -1,7 +1,9 @@
-# Coverage configuration for RegexLab
+# Coverage configuration: the coverage gate (tox and the CI) and plain pytest runs
 
 [run]
-source = src
+# The repository root: RegexLab.py, src/ and tools/ (coverage searches only directories that hold __init__.py)
+source = .
+branch = True
 omit =
     */site-packages/*
     */tests/*
@@ -12,7 +14,8 @@ precision = 2
 show_missing = True
 skip_covered = False
 
-# Exclude specific patterns from coverage
+# An explicit list, so that coverage 7.6.1 (Python 3.8) and 7.16.2 (Python 3.14) exclude the same lines: their default
+# lists differ. The first six patterns are those the test configuration used so far; "if TYPE_CHECKING:" is added.
 exclude_lines =
     # Have to re-enable the standard pragma
     pragma: no cover
@@ -29,6 +32,14 @@ exclude_lines =
 
     # Don't complain about abstract methods
     @abstractmethod
+
+    # Imports for type checkers only: never run, by construction
+    if TYPE_CHECKING:
+
+# Explicit too: coverage's default pattern also honours other spellings of the branch pragma, which the coverage gate
+# does not count. Only the spelling it counts excuses a partial branch.
+partial_branches =
+    pragma: no branch
 
 [html]
 directory = htmlcov

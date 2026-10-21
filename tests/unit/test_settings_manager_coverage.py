@@ -1,8 +1,8 @@
-import sys
-from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 from src.core.settings_manager import SettingsManager
+
+from tests.sublime_fakes import installed_sublime_fakes
 
 
 class TestSettingsManagerImportError:
@@ -233,9 +233,9 @@ class TestSettingsManagerSaveSettings:
                 return key in self.store
 
         manager._settings = FakeSettings()
-        fake_sublime = SimpleNamespace(save_settings=MagicMock())
 
-        with patch.dict(sys.modules, {"sublime": fake_sublime}):
+        with installed_sublime_fakes() as fakes:
+            fake_sublime = fakes.sublime
             manager._save_settings()
 
         fake_sublime.save_settings.assert_called_once_with(manager.settings_file)

@@ -74,10 +74,11 @@ tests/* linguist-documentation
 # Release archives (exclude from GitHub zip/tar when tagging)
 # =============================================================================
 
-# Don't ship docs, GitHub meta, coverage, long exchanges, or tests in Package Control builds
+# Don't ship docs, GitHub meta, coverage, long exchanges, tests, or development tools in Package Control builds
 /docs export-ignore
 /.github export-ignore
 /tests export-ignore
+/tools export-ignore
 /.editorconfig export-ignore
 /.markdownlint-cli2.jsonc export-ignore
 /tox.ini export-ignore
@@ -85,12 +86,8 @@ tests/* linguist-documentation
 
 # Coverage outputs and caches
 /htmlcov export-ignore
-/htmlcov-core export-ignore
-/htmlcov-ui export-ignore
 /.coverage export-ignore
 /.coveragerc export-ignore
-/.coveragerc-core export-ignore
-/.coveragerc-ui export-ignore
 /.mypy_cache export-ignore
 /.pytest_cache export-ignore
 /.ruff_cache export-ignore

@@ -26,6 +26,8 @@ from src.core.portfolio_manager import PortfolioManager
 from src.core.settings_manager import SettingsManager
 from src.services.portfolio_service import PortfolioService
 
+from tests.sublime_fakes import installed_sublime_fakes
+
 
 class MockWindow:
     """Mock Sublime Text window for testing."""
@@ -377,18 +379,11 @@ class TestPortfolioManagerCommand(unittest.TestCase):
 
     def test_quick_panel_uses_monospace_font(self) -> None:
         """Test that Quick Panel uses MONOSPACE_FONT flag."""
-        # Arrange - create a mock sublime module with MONOSPACE_FONT constant
-        import sys
-        from unittest.mock import MagicMock
+        # Arrange - the shared stand-in for sublime carries MONOSPACE_FONT (1, as in Sublime Text); installed after
+        # setUp, whose settings manager keeps its fallback settings
+        with installed_sublime_fakes() as fakes:
+            fakes.sublime.packages_path.return_value = str(Path.home() / ".config" / "sublime-text" / "Packages")
 
-        mock_sublime = MagicMock()
-        mock_sublime.MONOSPACE_FONT = 1
-        mock_sublime.packages_path.return_value = str(Path.home() / ".config" / "sublime-text" / "Packages")
-
-        # Inject mock into sys.modules before command execution
-        sys.modules["sublime"] = mock_sublime
-
-        try:
             # Act
             self.command.run(self.window)
 
@@ -396,11 +391,6 @@ class TestPortfolioManagerCommand(unittest.TestCase):
             self.assertEqual(len(self.window.quick_panels), 1)
             _items, _on_done, flags = self.window.quick_panels[0]
             self.assertEqual(flags, 1)  # MONOSPACE_FONT
-
-        finally:
-            # Cleanup - remove mock from sys.modules
-            if "sublime" in sys.modules:
-                del sys.modules["sublime"]
 
     def test_available_portfolios_section(self) -> None:
         """Test that disabled portfolios section appears when portfolios found."""
@@ -780,8 +770,6 @@ class TestPortfolioManagerPathSafety(unittest.TestCase):
 
     # A JSON root that is a string, not an object: it holds no portfolio, though it contains every field name
     UNREADABLE_STRING_ROOT = json.dumps("name description version patterns")
-    # Arrays nested so deep that decoding them raises RecursionError
-    UNREADABLE_DEEP_NESTING = "[" * 100000 + "]" * 100000
 
     def setUp(self) -> None:
         """Build a throwaway folder that plays Sublime Text's Packages, with fresh singletons."""
@@ -1660,14 +1648,18 @@ class TestPortfolioManagerPathSafety(unittest.TestCase):
         self.assertTrue(own_file.exists())
 
     def test_delete_unreadable_deep_nesting_is_refused(self) -> None:
-        """a.json now nests arrays so deep that decoding it raises RecursionError: refused as unreadable."""
+        """
+        RecursionError while decoding the JSON of a.json (raised by json.loads, as by arrays nested too deep): the
+        delete is refused as unreadable, and a.json stays. The error is injected: the depth at which the decoder
+        raises it varies with the interpreter and with its stack.
+        """
         own_file = self._write_portfolio(self.portfolios_dir / "a.json", "Foo")
         self._load(own_file)
-        own_file.write_text(self.UNREADABLE_DEEP_NESTING, encoding="utf-8")
-        with self.assertRaises(RecursionError):
-            self.portfolio_service.validate_portfolio_file(str(own_file))
 
-        operations = self._run_recording_file_operations(lambda: self.command._execute_delete(self.window, "Foo", None))
+        with patch("json.loads", side_effect=RecursionError):
+            operations = self._run_recording_file_operations(
+                lambda: self.command._execute_delete(self.window, "Foo", None)
+            )
 
         self._assert_refused(operations, self.MOTIVE_UNREADABLE)
         self.assertTrue(

@@ -16,6 +16,8 @@ from unittest.mock import Mock, patch
 from src.commands.new_portfolio_wizard_command import NewPortfolioWizardCommand
 from src.core.models import Portfolio
 
+from tests.sublime_fakes import installed_sublime_fakes
+
 
 class MockWindow:
     """Mock Sublime Text window for testing."""
@@ -300,13 +302,13 @@ class TestNewPortfolioWizardCommandTagsInput(unittest.TestCase):
         # Check wizard data
         self.assertEqual(self.wizard.wizard_data["tags"], [])
 
-    @patch.dict("sys.modules", {"sublime": Mock(MONOSPACE_FONT=1)})
     def test_tags_input_proceeds_to_confirmation(self):
         """Test tags input proceeds to confirmation."""
-        self.wizard._on_tags_done(self.window, "tag1")
+        with installed_sublime_fakes():
+            self.wizard._on_tags_done(self.window, "tag1")
 
-        # Check proceeded to Step 5 (quick panel shown)
-        self.assertEqual(len(self.window.quick_panels), 1)
+            # Check proceeded to Step 5 (quick panel shown)
+            self.assertEqual(len(self.window.quick_panels), 1)
 
 
 class TestNewPortfolioWizardCommandConfirmation(unittest.TestCase):
@@ -333,20 +335,20 @@ class TestNewPortfolioWizardCommandConfirmation(unittest.TestCase):
         self.assertIn("John Doe", summary_text)
         self.assertIn("tag1, tag2", summary_text)
 
-    @patch.dict("sys.modules", {"sublime": Mock(MONOSPACE_FONT=1)})
     def test_confirmation_shows_quick_panel(self):
         """Test confirmation shows quick panel with actions."""
-        self.wizard._show_confirmation(self.window)
+        with installed_sublime_fakes():
+            self.wizard._show_confirmation(self.window)
 
-        # Check quick panel shown
-        self.assertEqual(len(self.window.quick_panels), 1)
+            # Check quick panel shown
+            self.assertEqual(len(self.window.quick_panels), 1)
 
-        # Check items include summary and actions
-        items = self.window.quick_panels[0]["items"]
-        items_text = "\n".join(items)
-        self.assertIn("TestPortfolio", items_text)
-        self.assertIn("\u2705 Create Portfolio", items_text)  # ✅
-        self.assertIn("\u274c Cancel", items_text)  # ❌
+            # Check items include summary and actions
+            items = self.window.quick_panels[0]["items"]
+            items_text = "\n".join(items)
+            self.assertIn("TestPortfolio", items_text)
+            self.assertIn("\u2705 Create Portfolio", items_text)  # ✅
+            self.assertIn("\u274c Cancel", items_text)  # ❌
 
     def test_confirmation_user_cancels(self):
         """Test user canceling confirmation (index=-1)."""

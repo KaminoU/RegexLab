@@ -504,7 +504,7 @@ class TestShowPersistentStatus:
 
         window.status_message.assert_called_once_with("RegexLab: Processing")
 
-    def test_show_persistent_status_with_stubbed_sublime(self):
+    def test_show_persistent_status_with_stubbed_sublime(self, sublime_fakes):
         """Should schedule repeated status messages when sublime module exists."""
         from src.core.helpers import show_persistent_status
 
@@ -514,19 +514,17 @@ class TestShowPersistentStatus:
             def status_message(self, message: str) -> None:
                 status_calls.append(message)
 
-        class FakeSublime:
-            def __init__(self) -> None:
-                self.timeout_calls: list[int] = []
+        fake_sublime = sublime_fakes.sublime
+        fake_sublime.timeout_calls = []
 
-            def set_timeout(self, callback, delay: int) -> None:  # type: ignore[override]
-                self.timeout_calls.append(delay)
-                callback()
+        def set_timeout(callback, delay: int) -> None:
+            fake_sublime.timeout_calls.append(delay)
+            callback()
 
-        fake_sublime = FakeSublime()
+        fake_sublime.set_timeout = set_timeout
         settings = SimpleNamespace(get=lambda key, default: 4000 if key == "status_message_duration" else default)
 
-        with patch.dict("sys.modules", {"sublime": fake_sublime}):
-            show_persistent_status(FakeWindow(), "RegexLab: Done", settings_manager=settings)
+        show_persistent_status(FakeWindow(), "RegexLab: Done", settings_manager=settings)
 
         assert status_calls.count("RegexLab: Done") >= 2  # initial + at least one repeat
         assert fake_sublime.timeout_calls, "Expected set_timeout to be invoked at least once"

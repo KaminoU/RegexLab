@@ -202,6 +202,10 @@ class TestPortfolioServiceLoadSave:
         self.temp_dir = tempfile.mkdtemp()
         self.temp_path = Path(self.temp_dir)
 
+    def teardown_method(self) -> None:
+        """Remove the temp directory."""
+        shutil.rmtree(self.temp_dir)
+
     def test_load_portfolio(self) -> None:
         """Test loading a portfolio and setting it as active."""
         # Create and save a portfolio
@@ -243,6 +247,10 @@ class TestPortfolioServiceExportImport:
         self.service = PortfolioService()
         self.temp_dir = tempfile.mkdtemp()
         self.temp_path = Path(self.temp_dir)
+
+    def teardown_method(self) -> None:
+        """Remove the temp directory."""
+        shutil.rmtree(self.temp_dir)
 
     def test_export_portfolio(self) -> None:
         """Test exporting a portfolio."""
@@ -337,6 +345,10 @@ class TestPortfolioServiceQuickWins:
         self.temp_dir = tempfile.mkdtemp()
         self.temp_path = Path(self.temp_dir)
         self.service = PortfolioService()
+
+    def teardown_method(self) -> None:
+        """Remove the temp directory."""
+        shutil.rmtree(self.temp_dir)
 
     def test_add_pattern_to_portfolio_success_logs_and_saves(self) -> None:
         """Adding a pattern to a named portfolio should persist and log success."""

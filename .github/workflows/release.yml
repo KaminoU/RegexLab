@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Verify integrity keystore exists
         run: |
@@ -59,8 +59,14 @@ jobs:
       - name: Generate changelog
         id: changelog
         run: |
-          # Extract changelog for this version
-          awk '/^## \[${{ steps.version.outputs.VERSION }}\]/,/^## \[/' CHANGELOG.md | head -n -1 > release_notes.md
+          # Extract changelog for this version: the lines between its "## [X.Y.Z]" heading and the
+          # next "---" or "## [" line, without leading or trailing blank lines (POSIX awk only)
+          awk -v version="${{ steps.version.outputs.VERSION }}" '
+            !found { if (index($0, "## [" version "]") == 1) found = 1; next }
+            /^---/ || /^## \[/ { exit }
+            NF == 0 { if (started) blanks = blanks $0 "\n"; next }
+            { printf "%s", blanks; blanks = ""; started = 1; print }
+          ' CHANGELOG.md > release_notes.md
           # Fallback if extraction fails
           if [ ! -s release_notes.md ]; then
             echo "Release v${{ steps.version.outputs.VERSION }}" > release_notes.md
@@ -69,7 +75,7 @@ jobs:
           fi
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: RegexLab-${{ steps.version.outputs.VERSION }}.zip
           body_path: release_notes.md

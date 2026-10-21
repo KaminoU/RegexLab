@@ -192,7 +192,9 @@ class RegexLabReloadPortfoliosCommand(sublime_plugin.WindowCommand):
             try:
                 # First builtin portfolio becomes the "builtin principal" (backward compat)
                 set_as_builtin_flag = is_builtin and first_builtin
-                service.portfolio_manager.load_portfolio(portfolio_path, set_as_builtin=set_as_builtin_flag, reload=True)
+                service.portfolio_manager.load_portfolio(
+                    portfolio_path, set_as_builtin=set_as_builtin_flag, reload=True
+                )
                 if is_builtin and first_builtin:
                     first_builtin = False
                 loaded_count += 1
@@ -205,7 +207,9 @@ class RegexLabReloadPortfoliosCommand(sublime_plugin.WindowCommand):
             self.window.status_message(f"RegexLab: Successfully reloaded {loaded_count} portfolio(s)")
             logger.info("✓ Portfolio reload complete: %s loaded", loaded_count)
         else:
-            self.window.status_message(f"RegexLab: Reloaded {loaded_count} portfolio(s), {failed_count} failed (see console)")
+            self.window.status_message(
+                f"RegexLab: Reloaded {loaded_count} portfolio(s), {failed_count} failed (see console)"
+            )
             logger.warning("⚠ Portfolio reload: %s loaded, %s failed", loaded_count, failed_count)
 
 
@@ -435,6 +439,8 @@ def plugin_loaded() -> None:
         if len(error_messages) > 3:
             display_errors.append(f"\n... and {len(error_messages) - 3} more error(s).")
 
-        error_dialog = "RegexLab: Portfolio Loading Errors\n\n" + "\n\n━━━━━━━━━━━━━━━━━━━━━━━━\n\n".join(display_errors)
+        error_dialog = "RegexLab: Portfolio Loading Errors\n\n" + "\n\n━━━━━━━━━━━━━━━━━━━━━━━━\n\n".join(
+            display_errors
+        )
 
         sublime.error_message(error_dialog)

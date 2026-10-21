@@ -18,11 +18,20 @@ Changelog = "https://github.com/KaminoU/RegexLab/blob/main/CHANGELOG.md"
 [project.optional-dependencies]
 dev = [
     "ruff>=0.1.0",
-    "mypy>=1.0.0,<1.20.0", # mypy 1.15+ requires Python 3.9+
+    "mypy>=1.0.0,<2.2.0", # mypy 1.15+ requires Python 3.9+
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
+    # Pinned: the per-module ceilings of tools/coverage_gate depend on how coverage counts branches
+    "coverage==7.6.1; python_version < '3.9'", # last coverage for 3.8, where the gate checks lines only
+    "coverage==7.16.2; python_version >= '3.10'", # the branch ceilings are measured with this version
     "tox>=4.0.0",
 ]
+
+[tool.setuptools]
+# Install no package: Sublime Text loads the plugin from its folder, and the tests import src from the repository.
+# Without this, setuptools' auto-discovery installs the subpackages of src (commands, core, services, utils) as
+# top-level packages, where a mistaken bare import such as "from core.logger import ..." would resolve in the tests.
+packages = []
 
 [tool.ruff]
 # Target Python 3.8
@@ -108,7 +117,7 @@ norecursedirs = ["tests/ui", ".tox", ".git", "__pycache__"]
 addopts = [
     "-v",
     "--strict-markers",
-    "--cov=src",
+    "--cov",
     "--cov-report=term-missing",
     "--cov-report=html",
 ]
@@ -118,21 +127,6 @@ markers = [
     "unit: Unit tests (fast, no external dependencies)",
     "integration: Integration tests (require Sublime Text runtime)",
     "slow: Slow tests",
-]
-
-[tool.coverage.run]
-source = ["src"]
-omit = ["*/tests/*", "*/test_*.py"]
-
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if __name__ == .__main__.:",
-    "if TYPE_CHECKING:",
-    "@abstractmethod",
 ]
 
 [build-system]

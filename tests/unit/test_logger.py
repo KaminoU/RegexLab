@@ -10,8 +10,10 @@ Tests cover:
 """
 
 from io import StringIO
+from typing import Iterator
 from unittest.mock import MagicMock, patch
 
+import pytest
 from src.core.logger import Logger, LogLevel, get_logger, set_logger
 from src.core.settings_manager import SettingsManager
 
@@ -318,6 +320,17 @@ class TestLoggerError:
         assert "[RegexLab:ERROR] Failed to load: pattern.json" in output
 
 
+@pytest.fixture
+def restore_global_logger() -> Iterator[None]:
+    """Put the global logger back after a test, as the test found it, even when the test fails."""
+    from src.core import logger as logger_module
+
+    saved = logger_module._logger_instance
+    yield
+    logger_module._logger_instance = saved
+
+
+@pytest.mark.usefixtures("restore_global_logger")
 class TestGlobalLogger:
     """Test global logger instance management."""
 

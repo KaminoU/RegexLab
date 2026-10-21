@@ -6,7 +6,6 @@ Tests the core pattern injection logic for Find, Replace, and Find in Files pane
 
 from __future__ import annotations
 
-from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 from src.utils.panel_injection import (
@@ -66,14 +65,14 @@ class TestInjectIntoFindPanel:
         window.status_message.assert_called_once_with("Regex Lab: Pattern copied to clipboard (no active view)")
 
     @patch("src.utils.panel_injection.get_logger")
-    def test_inject_into_find_panel_no_view_sets_clipboard(self, mock_get_logger: MagicMock) -> None:
+    def test_inject_into_find_panel_no_view_sets_clipboard(self, mock_get_logger: MagicMock, sublime_fakes) -> None:
         """When sublime is available, clipboard should receive the pattern on error."""
         mock_logger = MagicMock()
         mock_get_logger.return_value = mock_logger
 
         clipboard_calls: list[str] = []
 
-        fake_sublime = SimpleNamespace()
+        fake_sublime = sublime_fakes.sublime
 
         def set_clipboard(value: str) -> None:
             clipboard_calls.append(value)
@@ -88,8 +87,7 @@ class TestInjectIntoFindPanel:
         window = MagicMock()
         window.active_view.return_value = None
 
-        with patch.dict("sys.modules", {"sublime": fake_sublime}):
-            inject_into_find_panel(window, "clipboard_pattern", "Pattern")
+        inject_into_find_panel(window, "clipboard_pattern", "Pattern")
 
         assert clipboard_calls == ["clipboard_pattern"]
 
@@ -114,7 +112,7 @@ class TestInjectIntoFindPanel:
         view.set_read_only.assert_any_call(True)
 
     @patch("src.utils.panel_injection.get_logger")
-    def test_inject_into_find_panel_uses_sublime_region(self, mock_get_logger: MagicMock) -> None:
+    def test_inject_into_find_panel_uses_sublime_region(self, mock_get_logger: MagicMock, sublime_fakes) -> None:
         """Should create Regions via sublime module when available."""
         mock_logger = MagicMock()
         mock_get_logger.return_value = mock_logger
@@ -125,7 +123,9 @@ class TestInjectIntoFindPanel:
             def __init__(self, a: int, b: int) -> None:
                 region_calls.append((a, b))
 
-        fake_sublime = SimpleNamespace(set_clipboard=lambda _value: None, Region=FakeRegion)
+        fake_sublime = sublime_fakes.sublime
+        fake_sublime.set_clipboard = lambda _value: None
+        fake_sublime.Region = FakeRegion
 
         window = MagicMock()
         view = MagicMock()
@@ -133,8 +133,7 @@ class TestInjectIntoFindPanel:
         view.is_read_only.return_value = False
         view.sel.return_value = MagicMock()
 
-        with patch.dict("sys.modules", {"sublime": fake_sublime}):
-            inject_into_find_panel(window, "abc", "Pattern")
+        inject_into_find_panel(window, "abc", "Pattern")
 
         assert (0, 0) in region_calls
         assert (0, 3) in region_calls

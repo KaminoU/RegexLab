@@ -72,17 +72,16 @@ class TestFormatPathForDisplayRelativeMode:
         result = shorten_path(path, mode="relative", packages_path=packages_path)
         assert result == path
 
-    def test_relative_mode_auto_detect_packages_path(self):
+    def test_relative_mode_auto_detect_packages_path(self, sublime_fakes):
         """Relative mode should auto-detect packages_path from sublime module."""
         from src.core.helpers import shorten_path
 
-        mock_sublime = MagicMock()
+        mock_sublime = sublime_fakes.sublime
         mock_sublime.packages_path.return_value = r"C:\ST\Packages"
 
-        with patch.dict(sys.modules, {"sublime": mock_sublime}):
-            path = r"C:\ST\Packages\RegexLab\file.json"
-            result = shorten_path(path, mode="relative")
-            assert result == "./Packages/RegexLab/file.json"
+        path = r"C:\ST\Packages\RegexLab\file.json"
+        result = shorten_path(path, mode="relative")
+        assert result == "./Packages/RegexLab/file.json"
 
     def test_relative_mode_auto_detect_fallback_no_sublime(self):
         """Relative mode should fallback if sublime module unavailable."""
@@ -95,17 +94,16 @@ class TestFormatPathForDisplayRelativeMode:
             result = shorten_path(path, mode="relative")
             assert result == path  # Fallback: return unchanged
 
-    def test_relative_mode_auto_detect_fallback_attribute_error(self):
+    def test_relative_mode_auto_detect_fallback_attribute_error(self, sublime_fakes):
         """Relative mode should fallback if sublime.packages_path() raises AttributeError."""
         from src.core.helpers import shorten_path
 
-        mock_sublime = MagicMock()
+        mock_sublime = sublime_fakes.sublime
         mock_sublime.packages_path.side_effect = AttributeError("No packages_path")
 
-        with patch.dict(sys.modules, {"sublime": mock_sublime}):
-            path = r"C:\Some\Path\file.json"
-            result = shorten_path(path, mode="relative")
-            assert result == path  # Fallback: return unchanged
+        path = r"C:\Some\Path\file.json"
+        result = shorten_path(path, mode="relative")
+        assert result == path  # Fallback: return unchanged
 
     def test_relative_mode_normalizes_backslashes(self):
         """Relative mode should normalize backslashes to forward slashes."""

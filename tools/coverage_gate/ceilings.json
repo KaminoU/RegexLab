@@ -1,0 +1,206 @@
+{
+  "branch_coverage_version": "7.16.2",
+  "cells": [
+    "coverage-macos-26-python-3.14",
+    "coverage-macos-26-python-3.8",
+    "coverage-ubuntu-24.04-python-3.14",
+    "coverage-ubuntu-24.04-python-3.8",
+    "coverage-windows-2025-python-3.14",
+    "coverage-windows-2025-python-3.8"
+  ],
+  "format": 1,
+  "modules": {
+    "RegexLab.py": {
+      "excluded_lines": 0,
+      "missing_branches": 57,
+      "missing_lines": 198,
+      "pragmas": 0
+    },
+    "src/__init__.py": {
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "pragmas": 0
+    },
+    "src/commands/__init__.py": {
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "pragmas": 0
+    },
+    "src/commands/about_command.py": {
+      "excluded_lines": 2,
+      "missing_branches": 0,
+      "missing_lines": 16,
+      "pragmas": 0
+    },
+    "src/commands/add_pattern_command.py": {
+      "excluded_lines": 2,
+      "missing_branches": 26,
+      "missing_lines": 124,
+      "pragmas": 0
+    },
+    "src/commands/delete_pattern_command.py": {
+      "excluded_lines": 2,
+      "missing_branches": 8,
+      "missing_lines": 55,
+      "pragmas": 0
+    },
+    "src/commands/edit_pattern_command.py": {
+      "excluded_lines": 2,
+      "missing_branches": 38,
+      "missing_lines": 90,
+      "pragmas": 0
+    },
+    "src/commands/generate_integrity_command.py": {
+      "excluded_lines": 0,
+      "missing_branches": 10,
+      "missing_lines": 53,
+      "pragmas": 0
+    },
+    "src/commands/load_pattern_command.py": {
+      "excluded_lines": 2,
+      "missing_branches": 78,
+      "missing_lines": 200,
+      "pragmas": 0
+    },
+    "src/commands/new_portfolio_wizard_command.py": {
+      "excluded_lines": 0,
+      "missing_branches": 4,
+      "missing_lines": 10,
+      "pragmas": 0
+    },
+    "src/commands/portfolio_manager_command.py": {
+      "excluded_lines": 3,
+      "missing_branches": 128,
+      "missing_lines": 430,
+      "pragmas": 0
+    },
+    "src/commands/portfolio_manager_command_helper.py": {
+      "excluded_lines": 3,
+      "missing_branches": 54,
+      "missing_lines": 143,
+      "pragmas": 0
+    },
+    "src/commands/use_selection_command.py": {
+      "excluded_lines": 2,
+      "missing_branches": 24,
+      "missing_lines": 97,
+      "pragmas": 0
+    },
+    "src/core/__init__.py": {
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "pragmas": 0
+    },
+    "src/core/constants.py": {
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "pragmas": 0
+    },
+    "src/core/helpers.py": {
+      "excluded_lines": 0,
+      "missing_branches": 7,
+      "missing_lines": 10,
+      "pragmas": 0
+    },
+    "src/core/integrity_manager.py": {
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 5,
+      "pragmas": 0
+    },
+    "src/core/logger.py": {
+      "excluded_lines": 0,
+      "missing_branches": 1,
+      "missing_lines": 0,
+      "pragmas": 0
+    },
+    "src/core/models.py": {
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "pragmas": 0
+    },
+    "src/core/pattern_engine.py": {
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "pragmas": 0
+    },
+    "src/core/portfolio_manager.py": {
+      "excluded_lines": 0,
+      "missing_branches": 3,
+      "missing_lines": 5,
+      "pragmas": 0
+    },
+    "src/core/settings_manager.py": {
+      "excluded_lines": 0,
+      "missing_branches": 1,
+      "missing_lines": 1,
+      "pragmas": 0
+    },
+    "src/services/__init__.py": {
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "pragmas": 0
+    },
+    "src/services/pattern_service.py": {
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "pragmas": 0
+    },
+    "src/services/portfolio_service.py": {
+      "excluded_lines": 0,
+      "missing_branches": 1,
+      "missing_lines": 1,
+      "pragmas": 0
+    },
+    "src/utils/__init__.py": {
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "pragmas": 0
+    },
+    "src/utils/panel_injection.py": {
+      "excluded_lines": 2,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "pragmas": 0
+    },
+    "tools/__init__.py": {
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "pragmas": 0
+    },
+    "tools/coverage_gate/__init__.py": {
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "pragmas": 0
+    },
+    "tools/coverage_gate/_report.py": {
+      "excluded_lines": 0,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "pragmas": 0
+    },
+    "tools/coverage_gate/check.py": {
+      "excluded_lines": 2,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "pragmas": 0
+    },
+    "tools/coverage_gate/generate.py": {
+      "excluded_lines": 2,
+      "missing_branches": 0,
+      "missing_lines": 0,
+      "pragmas": 0
+    }
+  }
+}

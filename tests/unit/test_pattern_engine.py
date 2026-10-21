@@ -11,11 +11,20 @@ Tests cover:
 
 import re
 from datetime import datetime
+from typing import Optional, Type
+from unittest.mock import MagicMock
 
 import pytest
 from src.core.models import Pattern, PatternType
 from src.core.pattern_engine import PatternEngine
 from src.core.settings_manager import SettingsManager
+
+
+def _settings_without_variables() -> MagicMock:
+    """A settings manager stand-in without variables settings: PatternEngine takes its own defaults, no username."""
+    settings = MagicMock()
+    settings.get_nested.side_effect = lambda _key, default=None: default
+    return settings
 
 
 class TestPatternEngineInit:
@@ -108,15 +117,15 @@ class TestPatternEngineBuiltinVariables:
 
         assert username_value == "bob"
 
-    def test_resolve_username_system_fallback(self) -> None:
-        """Test username falls back to system username."""
-        engine = PatternEngine()
+    def test_resolve_username_system_fallback(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Test username falls back to the system username, whoever runs the suite."""
+        import getpass
+
+        monkeypatch.setattr(getpass, "getuser", lambda: "system_user")
+        engine = PatternEngine(settings_manager=_settings_without_variables())
         username_value = engine._get_builtin_variable("username")
 
-        # Should get some username (system dependent)
-        assert username_value is not None
-        assert len(username_value) > 0
-        assert username_value != "unknown"
+        assert username_value == "system_user"
 
     def test_resolve_clipboard_no_sublime(self) -> None:
         """Test clipboard variable when sublime is not available."""
@@ -126,17 +135,11 @@ class TestPatternEngineBuiltinVariables:
         # Should return empty string when sublime not available
         assert clipboard_value == ""
 
-    def test_resolve_clipboard_with_sublime(self, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_resolve_clipboard_with_sublime(self, sublime_fakes) -> None:
         """Test clipboard variable with sublime module available (covers lines 124-125)."""
-        import sys
-        from unittest.mock import MagicMock
-
-        # Create a mock sublime module that successfully returns clipboard content
-        mock_sublime = MagicMock()
+        # The shared stand-in for sublime successfully returns clipboard content
+        mock_sublime = sublime_fakes.sublime
         mock_sublime.get_clipboard.return_value = "Mocked clipboard content"
-
-        # Inject mock into sys.modules
-        monkeypatch.setitem(sys.modules, "sublime", mock_sublime)
 
         engine = PatternEngine()
         pattern = Pattern(name="Test", regex=r"Clip: {{CLIPBOARD}}", type=PatternType.DYNAMIC)
@@ -380,6 +383,41 @@ class TestPatternEngineExceptionHandling:
 
         assert result == "User: unknown"
 
+    @pytest.mark.parametrize("error", [KeyError, OSError, ImportError])
+    @pytest.mark.parametrize(
+        ("user", "username", "expected"),
+        [
+            ("from_user", "from_username", "from_user"),
+            (None, "from_username", "from_username"),
+            (None, None, "unknown"),
+        ],
+        ids=["USER", "USERNAME", "unknown"],
+    )
+    def test_username_fallback_order(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        error: Type[Exception],
+        user: Optional[str],
+        username: Optional[str],
+        expected: str,
+    ) -> None:
+        """When getpass.getuser() raises a handled error, {username} is USER, then USERNAME, then "unknown"."""
+        import getpass
+
+        def raise_error() -> str:
+            raise error("simulated")
+
+        monkeypatch.setattr(getpass, "getuser", raise_error)
+        for name, value in (("USER", user), ("USERNAME", username)):
+            if value is None:
+                monkeypatch.delenv(name, raising=False)
+            else:
+                monkeypatch.setenv(name, value)
+
+        engine = PatternEngine(settings_manager=_settings_without_variables())
+
+        assert engine._get_builtin_variable("username") == expected
+
     def test_clipboard_exception_importerror(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Test {clipboard} returns empty string when sublime unavailable."""
         # No need to mock - sublime already unavailable in test environment
@@ -390,18 +428,11 @@ class TestPatternEngineExceptionHandling:
         # ImportError -> empty string fallback
         assert result == "Clip: "
 
-    def test_clipboard_exception_generic(self, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_clipboard_exception_generic(self, sublime_fakes) -> None:
         """Test {clipboard} returns empty string on generic exception (lines 123-125)."""
-        # Mock sublime module to raise a generic Exception when get_clipboard() is called
-        import sys
-        from unittest.mock import MagicMock
-
-        # Create a mock sublime module
-        mock_sublime = MagicMock()
+        # The shared stand-in for sublime raises a generic Exception when get_clipboard() is called
+        mock_sublime = sublime_fakes.sublime
         mock_sublime.get_clipboard.side_effect = RuntimeError("Clipboard access failed")
-
-        # Inject mock into sys.modules
-        monkeypatch.setitem(sys.modules, "sublime", mock_sublime)
 
         engine = PatternEngine()
         pattern = Pattern(name="Test", regex=r"Clip: {{CLIPBOARD}}", type=PatternType.DYNAMIC)

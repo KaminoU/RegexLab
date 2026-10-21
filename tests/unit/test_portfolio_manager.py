@@ -63,6 +63,10 @@ class TestPortfolioManagerLoad:
         self.temp_dir = tempfile.mkdtemp()
         self.temp_path = Path(self.temp_dir)
 
+    def teardown_method(self) -> None:
+        """Remove the temp directory."""
+        shutil.rmtree(self.temp_dir)
+
     def test_load_portfolio_success(self) -> None:
         """Test successfully loading a valid portfolio."""
         # Create a test portfolio file
@@ -138,6 +142,10 @@ class TestPortfolioManagerSave:
         PortfolioManager.reset_instance()
         self.temp_dir = tempfile.mkdtemp()
         self.temp_path = Path(self.temp_dir)
+
+    def teardown_method(self) -> None:
+        """Remove the temp directory."""
+        shutil.rmtree(self.temp_dir)
 
     def test_save_portfolio_success(self) -> None:
         """Test successfully saving a portfolio."""
@@ -222,11 +230,9 @@ class TestPortfolioManagerActive:
 
         assert manager.get_active_portfolio() is None
 
-    def test_load_and_set_active(self) -> None:
+    def test_load_and_set_active(self, tmp_path: Path) -> None:
         """Test loading and setting active portfolio in one operation."""
-        temp_dir = tempfile.mkdtemp()
-        temp_path = Path(temp_dir)
-        portfolio_path = temp_path / "test.json"
+        portfolio_path = tmp_path / "test.json"
 
         data = {
             "name": "Test Portfolio",
@@ -243,11 +249,9 @@ class TestPortfolioManagerActive:
         assert portfolio.name == "Test Portfolio"
         assert manager.get_active_portfolio() is portfolio
 
-    def test_save_active_portfolio_success(self) -> None:
+    def test_save_active_portfolio_success(self, tmp_path: Path) -> None:
         """Test saving the active portfolio."""
-        temp_dir = tempfile.mkdtemp()
-        temp_path = Path(temp_dir)
-        portfolio_path = temp_path / "active.json"
+        portfolio_path = tmp_path / "active.json"
 
         portfolio = Portfolio(name="Active Portfolio")
         manager = PortfolioManager.get_instance()
@@ -259,11 +263,9 @@ class TestPortfolioManagerActive:
         data = json.loads(portfolio_path.read_text(encoding="utf-8"))
         assert data["name"] == "Active Portfolio"
 
-    def test_save_active_portfolio_no_active_raises(self) -> None:
+    def test_save_active_portfolio_no_active_raises(self, tmp_path: Path) -> None:
         """Test that saving without active portfolio raises ValueError."""
-        temp_dir = tempfile.mkdtemp()
-        temp_path = Path(temp_dir)
-        portfolio_path = temp_path / "test.json"
+        portfolio_path = tmp_path / "test.json"
 
         manager = PortfolioManager.get_instance()
 
@@ -279,6 +281,10 @@ class TestPortfolioManagerExportImport:
         PortfolioManager.reset_instance()
         self.temp_dir = tempfile.mkdtemp()
         self.temp_path = Path(self.temp_dir)
+
+    def teardown_method(self) -> None:
+        """Remove the temp directory."""
+        shutil.rmtree(self.temp_dir)
 
     def test_export_portfolio(self) -> None:
         """Test exporting portfolio to user-chosen location."""
@@ -341,6 +347,10 @@ class TestPortfolioManagerEdgeCases:
         self.temp_dir = tempfile.mkdtemp()
         self.temp_path = Path(self.temp_dir)
 
+    def teardown_method(self) -> None:
+        """Remove the temp directory."""
+        shutil.rmtree(self.temp_dir)
+
     def test_reset_instance_clears_active_portfolio(self) -> None:
         """Test that reset_instance clears the active portfolio."""
         portfolio = Portfolio(name="Active")
@@ -364,6 +374,10 @@ class TestPortfolioManagerIntegration:
         PortfolioManager.reset_instance()
         self.temp_dir = tempfile.mkdtemp()
         self.temp_path = Path(self.temp_dir)
+
+    def teardown_method(self) -> None:
+        """Remove the temp directory."""
+        shutil.rmtree(self.temp_dir)
 
     def test_full_workflow(self) -> None:
         """Test complete workflow: create, save, load, modify, save."""

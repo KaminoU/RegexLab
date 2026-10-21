@@ -12,24 +12,15 @@ import sys
 import types
 import unittest
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 from unittest.mock import MagicMock
+
+import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
-class _WindowCommand:
-    """Stand-in for sublime_plugin.WindowCommand."""
-
-    def __init__(self, window: Optional[Any] = None) -> None:
-        """Keep the window, as Sublime Text does."""
-        self.window = window
-
-
-class _ApplicationCommand:
-    """Stand-in for sublime_plugin.ApplicationCommand."""
-
-
+@pytest.mark.usefixtures("sublime_fakes")
 class TestPluginReload(unittest.TestCase):
     """RegexLab.py loaded as Sublime Text loads it, then run again as Sublime Text reloads it."""
 
@@ -37,17 +28,11 @@ class TestPluginReload(unittest.TestCase):
     LOOKALIKES = ("RegexLab.srcx", "RegExLink.src", "RegExLink.src.core", "regexlab.src.core")
 
     def setUp(self) -> None:
-        """Save sys.modules, then provide sublime, sublime_plugin and the package RegexLab, rooted at the repository."""
+        """Save sys.modules, then provide the package RegexLab, rooted at the repository (sublime: sublime_fakes)."""
         self.addCleanup(self._restore_modules, dict(sys.modules))
         self.addCleanup(setattr, sys, "dont_write_bytecode", sys.dont_write_bytecode)
         # No bytecode written next to RegexLab.py, at the root of the repository
         sys.dont_write_bytecode = True
-
-        sublime_plugin = types.ModuleType("sublime_plugin")
-        sublime_plugin.WindowCommand = _WindowCommand  # type: ignore[attr-defined]
-        sublime_plugin.ApplicationCommand = _ApplicationCommand  # type: ignore[attr-defined]
-        sys.modules["sublime"] = MagicMock()
-        sys.modules["sublime_plugin"] = sublime_plugin
 
         self.package = types.ModuleType("RegexLab")
         self.package.__path__ = [str(REPO_ROOT)]
