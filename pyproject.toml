@@ -18,7 +18,7 @@ Changelog = "https://github.com/KaminoU/RegexLab/blob/main/CHANGELOG.md"
 [project.optional-dependencies]
 dev = [
     "ruff>=0.1.0",
-    "mypy>=1.0.0,<2.2.0", # mypy 1.15+ requires Python 3.9+
+    "mypy>=1.0.0,<2.5.0", # mypy 1.15+ requires Python 3.9+
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     # Pinned: the per-module ceilings of tools/coverage_gate depend on how coverage counts branches
